@@ -1,0 +1,6 @@
+﻿@(Html.Kendo().DropDownList()
+    .Name("role")
+    .BindTo(ViewBag.Roles as List<SelectListItem>)
+    .OptionLabel("Select Role")
+    .HtmlAttributes(new { style="width:100px;" })
+)

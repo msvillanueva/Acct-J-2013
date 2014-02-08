@@ -1,0 +1,6 @@
+﻿@(Html.Kendo().DropDownList()
+    .Name("projectid")
+    .BindTo(ViewBag.Projects as List<SelectListItem>)
+    .OptionLabel("Select Project")
+    .HtmlAttributes(new { style="width:250px;" })
+)

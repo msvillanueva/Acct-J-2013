@@ -1,0 +1,168 @@
+﻿@{
+    Layout = null;
+}
+
+
+<!DOCTYPE html>
+
+<html>
+<head runat="server">
+    <meta name="viewport" content="width=device-width" />
+    <meta http-equiv="X-UA-Compatible" content="IE=9" />
+
+	<link href="@Url.Content("~/Content/css/Custom.css")" rel="stylesheet" type="text/css" />
+	<link href="@Url.Content("~/Content/kendo/2013.1.319/kendo.common.min.css")" rel="stylesheet" type="text/css" />
+	<link href="@Url.Content("~/Content/kendo/2013.1.319/kendo.dataviz.min.css")" rel="stylesheet" type="text/css" />
+	<link href="@Url.Content("~/Content/kendo/2013.1.319/kendo.default.min.css")" rel="stylesheet" type="text/css" />
+	<link href="@Url.Content("~/Content/kendo/2013.1.319/kendo.dataviz.default.min.css")" rel="stylesheet" type="text/css" />
+
+    <link href="@Url.Content("~/Content/css/Main.css")" rel="stylesheet" type="text/css" />
+    <!--[if IE 8]><link href="@Url.Content("~/Content/css/ie8.css")" rel="stylesheet" type="text/css" /><![endif]-->
+
+	<script src="@Url.Content("~/Scripts/kendo/2013.1.319/jquery.min.js")"></script>
+	<script src="@Url.Content("~/Scripts/kendo/2013.1.319/kendo.all.min.js")"></script>
+	<script src="@Url.Content("~/Scripts/kendo/2013.1.319/kendo.aspnetmvc.min.js")"></script>
+	<script src="@Url.Content("~/Scripts/kendo.modernizr.custom.js")"></script>
+    <script src="@Url.Content("~/Scripts/jcambria-2.0.0.js")"></script>
+
+    <script src="@Url.Content("~/Scripts/jquery.validate.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/jquery.validate.unobtrusive.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/jquery-ui-1.9.2.custom.min.js")"></script>
+
+    <script src="@Url.Content("~/Scripts/js/plugins/ui/jquery.easytabs.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/js/plugins/ui/jquery.collapsible.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/js/files/bootstrap.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/Custom.js")"></script>
+</head>
+
+<body>
+	<div id="top">
+		<div class="fixed">
+			<a href="@Url.Action("Index", "Home")" title="" class="logo">
+                <embed src="@Url.Content("~/Content/svg/logo_w.svg")" type="image/svg+xml" />
+			</a>
+            <div class="fixed-title">Jaca Accounting System</div>
+            <div id="greeting_user">Hi @UserSession.User.Firstname</div>
+		</div>
+        
+	</div>
+
+	<!-- Content container -->
+	<div id="container">
+
+		<!-- Sidebar -->
+		<div id="sidebar">
+
+			<div class="sidebar-tabs">
+		        <ul class="tabs-nav two-items">
+		            @*<li><a href="#general" title=""><i class="icon-reorder"></i></a></li>*@
+                    <li></li>
+		        </ul>
+
+		        <div id="general">
+
+				    <!-- Main navigation -->
+                    @Html.Action("LeftNav", "_Utility")
+			        <!-- /main navigation -->
+
+		        </div>
+
+		    </div>
+		</div>
+		<!-- /sidebar -->
+
+
+		<!-- Content -->
+		<div id="content">
+
+		    <!-- Content wrapper -->
+		    <div class="wrapper">
+
+			    <!-- Breadcrumbs line -->
+			    <div class="crumbs">
+		            <ul id="breadcrumbs" class="breadcrumb"> 
+		                <li><a href="@Url.Action("Index", "Home")">Dashboard</a></li>
+                        @if (ViewBag.IsHome == null)
+                        {
+                            if (ViewBag.ParentUrl != null)
+                            {
+                                var actions = (List<Web.Models.CActionRoute>)ViewBag.ParentUrl;
+                                foreach (var a in actions)
+                                {
+                                    <li><a href="@Url.Action(a.Action, a.Controller)">@a.Description</a></li>
+                                }
+                            }
+                            <li class="active"><a href="@Request.Url.AbsoluteUri">@ViewBag.Title</a></li>   
+                        }
+		            </ul>
+			        
+		            <ul class="alt-buttons">
+                        @*<li><a href="@Url.Action("Index", "Logs")" title=""><i class="icon-list"></i><span>Account Settings</span></a></li>*@
+                        <li><a href="#" title="" id="btnLogout" class="logout_button"><i class="icon-off"></i><span>Logout</span></a></li>
+		            </ul>
+			    </div>
+			    <!-- /breadcrumbs line -->
+
+			    <!-- Page header -->
+			    <div class="page-header">
+			    	<div class="page-title">
+				    	<h5>@ViewBag.Title</h5>
+				    	<span>@ViewBag.Subtitle</span>
+			    	</div>
+
+			    </div>
+			    <!-- /page header -->
+
+                <div id="body">
+			        <section class="content-wrapper main-content clear-fix">
+				        @RenderBody()
+			        </section>
+                    <br />
+                    <br />
+		        </div>
+
+		    </div>
+		    <!-- /content wrapper -->
+
+		</div>
+		<!-- /content -->
+
+	</div>
+	<!-- /content container -->
+
+
+
+
+
+	<!-- Footer -->
+	<div id="footer">
+		<div class="copyrights">&copy;  JACA - 2013</div>
+@*		<ul class="footer-links">
+			<li><a href="" title=""><i class="icon-cogs"></i>Contact admin</a></li>
+			<li><a href="" title=""><i class="icon-screenshot"></i>Report bug</a></li>
+		</ul>*@
+	</div>
+	<!-- /footer -->
+</body>
+
+<script type="text/javascript">
+    $(function () {
+        $('#btnLogout').click(function () {
+            jConfirmBox("Are you sure you want to logout?", "Confirm Logout", function (result) {
+                if (result) {
+                    window.location = '@Url.Action("Logout", "Login")';
+                }
+            });
+        });
+
+        $('.expand').collapsible({
+            defaultOpen: 'current,third',
+            cookieName: 'navAct',
+            cssOpen: 'subOpened',
+            cssClose: 'subClosed',
+            speed: 200
+        });
+    });
+</script>
+
+</html>

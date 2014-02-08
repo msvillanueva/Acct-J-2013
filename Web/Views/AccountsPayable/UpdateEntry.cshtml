@@ -1,0 +1,217 @@
+﻿@{
+    Layout = "~/Views/Shared/_Window.cshtml";
+}
+
+@model Web.Models.CVoucherEntry
+
+<style>
+    .k-grid { width:400px; }
+    input[type='text'], input[type='password'] { width:200px; }
+    .form-label { width:120px; }
+    .k-pager-wrap { text-align:right; padding-right:30px; }
+    tr { height:30px; }
+</style>
+
+<div>
+    <form id="frmEntry">
+        <input type="hidden" name="voucherid" value="@Model.VoucherID" />
+        <input type="hidden" name="id" value="@Model.ID" />
+        <div class="k-widget k-grid" >
+            <table cellspacing="0">
+                <thead class="k-grid-header">
+                    <tr>
+                        <th class="k-header" colspan="2">Voucher Entry Information</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="form-label">Project:</td>
+                        <td>
+                            @Html.Partial(Url.Content("~/Views/Shared/EditorTemplates/_ProjectDropdown.cshtml"))
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="form-label">Code:</td>
+                        <td>
+                            @Html.TextBox("AccountEntryCode", Model.AccountEntryCode, new { @maxlength = 50, style="width:100px;" })
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="form-label">Title:</td>
+                        <td>
+                            @(Html.Kendo().DropDownList()
+                                .Name("accountentryid")
+                                .BindTo(ViewBag.AccountEntries as List<SelectListItem>)
+                                .OptionLabel("Select title")
+                                .HtmlAttributes(new { style="width:250px;" })
+                            )
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="form-label">Bank:</td>
+                        <td>
+                            @(Html.Kendo().DropDownList()
+                                .Name("bankid")
+                                .BindTo(ViewBag.Banks as List<SelectListItem>)
+                                .OptionLabel("N/A")
+                                .HtmlAttributes(new { style="width:250px;" })
+                            )
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="form-label">Debit:</td>
+                        <td>
+                            @(Html.Kendo().NumericTextBox<float>()
+                                .Name("debit")
+                                .Placeholder("0")
+                                .HtmlAttributes(new { @class = "kui-numeric", @style = "width:150px;" })
+                                .Min(0)
+                            )   
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="form-label">Credit:</td>
+                        <td>
+                            @(Html.Kendo().NumericTextBox<float>()
+                                .Name("credit")
+                                .Placeholder("0")
+                                .HtmlAttributes(new { @class = "kui-numeric", @style = "width:150px;" })
+                                .Min(0)
+                            )   
+                        </td>
+                    </tr>
+                    <tr><td></td><td></td></tr>
+                </tbody>
+            </table>
+        </div>
+        <div style="text-align:right; padding:10px 0 0 0;">
+            <input type="button" id="btnSave" value="@(ViewBag.Mode == "CREATE" ? "Add Entry" : "Save Changes")" class="k-button" />
+        </div>
+    </form>
+</div>
+
+<script type="text/javascript">
+    var mode = '@ViewBag.Mode';
+    var titles;
+    var timeoutId = 0;
+
+    $(function () {
+        //if (mode == 'EDIT')
+        //    FillupForm();
+
+        var _titles = '@Json.Encode(ViewBag.AccountEntriyLookup)';
+        titles = JSON.parse(_titles.replace(/&quot;/g, '"'));
+
+        $('#accountentryid').change(function () {
+            $('#AccountEntryCode').val(GetTitleByID($(this).val()).Code);
+        });
+
+        $('#AccountEntryCode').on('input', function () {
+            clearTimeout(timeoutId);
+            timeoutId = setTimeout(SetTitleDropdown, 500);
+        });
+
+        $('#btnSave').click(function () {
+            if ($('[name=accountentryid]').val().trim() == '') {
+                jAlertBox("Please select title.", "Data Error");
+                return false;
+            }
+
+            if ($('[name=projectid]').val().trim() == '') {
+                jAlertBox("Please select project.", "Data Error");
+                return false;
+            }
+
+            if ($('[name=debit]').val().trim() == '') {
+                jAlertBox("Debit value must be numeric.", "Data Error");
+                return false;
+            }
+
+            if ($('[name=credit]').val().trim() == '') {
+                jAlertBox("Credit value must be numeric.", "Data Error");
+                return false;
+            }
+
+            var toUrl;
+            var msg;
+            if (mode == 'EDIT') {
+                toUrl = '@Url.Action("Ajax_UpdateEntry", "AccountsPayable")';
+                msg = 'SAVING CHANGES..';
+            }
+            else {
+                toUrl = '@Url.Action("Ajax_InsertEntry", "AccountsPayable")';
+                msg = 'ADDING NEW ENTRY..';
+            }
+
+            var loader = parent.$("body").loading({ settings: { text: msg } });
+            $.ajax({
+                type: 'POST',
+                url: toUrl,
+                data: $('#frmEntry').serialize(),
+                success: function (result) {
+                    jsonText = JSON.stringify(result);
+                    data = JSON.parse(jsonText);
+                    if (data.Errors == null) {
+                        loader.hideLoading();
+                        saved(data.Data[0].ID);
+                    }
+                    else {
+                        loader.hideLoading();
+                        jAlertBox(data.Errors.data_error.errors[0], "Error");
+                    }
+                }
+            });
+        });
+    });
+
+    function GetTitleByID(id) {
+        var L = titles.length;
+        for (var i = 0; i < L; i++) {
+            if (titles[i].ID == id) {
+                return titles[i];
+            }
+        }
+        return '';
+    }
+
+    function GetTitleByCode(code) {
+        var L = titles.length;
+        for (var i = 0; i < L; i++) {
+            if (titles[i].Code.toLowerCase() == code.toLowerCase().trim()) {
+                return titles[i];
+            }
+        }
+        return null;
+    }
+
+    function FillupForm() {
+        //$('#txtFirstName').val('');
+    }
+
+    function saved(id) {
+        parent.RefreshGrid();
+        parent.CloseWindow();
+        //var msg = 'Changes has been successfully saved.';
+        //if (mode == 'CREATE') {
+        //    msg = 'New entry has been successfully added.';
+        //}
+        //jAlertBox(msg, "Saved", function () {
+        //    parent.CloseWindow();
+        //});
+    }
+
+    function SetTitleDropdown() {
+        var title = GetTitleByCode($('#AccountEntryCode').val());
+        var dropdownlist = $("[name=accountentryid]").data("kendoDropDownList");
+        if (title != null) {
+            dropdownlist.select(function (dataItem) {
+                return dataItem.Value === title.ID.toString();
+            });
+        }
+        else {
+            dropdownlist.select(function (dataItem) {
+                return dataItem.Value === '';
+            });
+        }
+    }
+</script>

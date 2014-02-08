@@ -1,0 +1,123 @@
+﻿@{
+    Layout = "~/Views/Shared/_Window.cshtml";
+}
+
+@model Web.Models.CSalesInvoice
+
+<style>
+    .k-grid { width:400px; }
+    input[type='text'], input[type='password'] { width:200px; }
+    .form-label { width:200px; }
+    .k-pager-wrap { text-align:right; padding-right:30px; }
+    tbdody tr { height:30px; }
+</style>
+
+<div>
+    <form id="frmInvoice">
+        <input type="hidden" name="id" value="@Model.ID" />
+        <div class="k-widget k-grid" >
+            <table cellspacing="0">
+                <thead class="k-grid-header">
+                    <tr>
+                        <th class="k-header" colspan="4">Submit Form</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="form-label">OR Number:</td>
+                        <td>
+                            @Html.TextBox("OrNo", Model.ORNo, new { @maxlength = 100, style="width:150px;" })   
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="form-label">PWD Discount:</td>
+                        <td>
+                            @(Html.Kendo().NumericTextBox<float>()
+                                .Name("PWDDiscount")
+                                .Placeholder("0")
+                                .HtmlAttributes(new { @class = "kui-numeric", @style = "width:150px;" })
+                                .Min(0)
+                            )   
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="form-label">VAT Exemption Sales:</td>
+                        <td>
+                            @(Html.Kendo().NumericTextBox<float>()
+                                .Name("VatExemptSales")
+                                .Placeholder("0")
+                                .HtmlAttributes(new { @class = "kui-numeric", @style = "width:150px;" })
+                                .Min(0)
+                            )   
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="form-label">Zero Rated Sales:</td>
+                        <td>
+                            @(Html.Kendo().NumericTextBox<float>()
+                                .Name("ZeroRatedSales")
+                                .Placeholder("0")
+                                .HtmlAttributes(new { @class = "kui-numeric", @style = "width:150px;" })
+                                .Min(0)
+                            )   
+                        </td>
+                    </tr>
+                    <tr><td></td><td></td></tr>
+                </tbody>
+            </table>
+        </div>
+        <div style="text-align:right; padding:10px 0 0 0;">
+            <input type="button" id="btnSave" value="Submit" class="k-button" />
+        </div>
+    </form>
+</div>
+
+<script type="text/javascript">
+    var mode = '@ViewBag.Mode';
+    var projects;
+    var timeoutId = 0;
+
+    $(function () {
+
+        $('#btnSave').click(function () {
+            if ($('[name=PWDDiscount]').val().trim() == '') {
+                jAlertBox("PWD Discount value must be numeric.", "Data Error");
+                return false;
+            }
+            if ($('[name=VatExemptSales]').val().trim() == '') {
+                jAlertBox("VAT Exemption Sales value must be numeric.", "Data Error");
+                return false;
+            }
+            if ($('[name=ZeroRatedSales]').val().trim() == '') {
+                jAlertBox("Zero Rated Sales value must be numeric.", "Data Error");
+                return false;
+            }
+
+            var loader = parent.$("body").loading({ settings: { text: "SUBMITTUNG SALES INVOICE" } });
+            $.ajax({
+                type: 'POST',
+                url: '@Url.Action("Ajax_SubmitInvoice", "AccountsReceivable")',
+                data: $('#frmInvoice').serialize(),
+                success: function (result) {
+                    jsonText = JSON.stringify(result);
+                    data = JSON.parse(jsonText);
+                    if (data.Errors == null) {
+                        loader.hideLoading();
+                        saved(data.Data[0].ID);
+                    }
+                    else {
+                        loader.hideLoading();
+                        jAlertBox(data.Errors.data_error.errors[0], "Error");
+                    }
+                }
+            });
+        });
+    });
+
+    function saved(id) {
+        var actionUrl = '@Url.Action("Index", "AccountsReceivable")';
+        var loader = parent.$("body").loading({ settings: { text: "REDIRECTING TO THE LIST INVOICES..." } });
+        parent.Redirect(actionUrl);
+    }
+
+</script>

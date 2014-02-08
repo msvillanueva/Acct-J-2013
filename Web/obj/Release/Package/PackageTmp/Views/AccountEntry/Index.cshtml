@@ -1,0 +1,133 @@
+﻿@{
+    ViewBag.Title = "Manage Account Entries";
+    Layout = "~/Views/Shared/_Secured.cshtml";
+}
+
+<style>
+    form.k-filter-menu .k-widget { width:180px; }
+    #Title.text-box { width:250px; }
+</style>
+
+@using Web.Models
+@model List<CAccountEntry>
+
+@(Html.Kendo().Grid<CAccountEntry>()
+    .Name("Grid")
+    .Columns(columns =>
+    {
+        columns.Bound(p => p.ID).Visible(false);
+        columns.Bound(p => p.Title).Title("Title");
+        columns.Bound(p => p.Code).Title("Code");
+        columns.Bound(p => p.TypeName).Title("Type").EditorTemplateName("_EntryTypeDropdown").Width(200);
+        columns.Bound(p => p.ClassName).Title("Expense Classification").EditorTemplateName("_EntryClassDropdown").Width(200);
+        columns.Command(command => { command.Edit(); command.Custom("Delete").Click("DeleteUser"); }).Width(180);
+    })
+    .ToolBar(toolbar => toolbar.Create().Text("Add account entry"))
+    .Editable(editable => editable.Mode(GridEditMode.InLine))
+    .Pageable()
+    //.Scrollable()
+    .Sortable()
+    .Filterable(a => a.Extra(false))
+    .DataSource(dataSource => dataSource
+        .Ajax()
+        .PageSize(10)
+        .Read(read => read.Action("Ajax_Read", "AccountEntry"))
+        .Events(events => events.Error("error_handler").Change("onChange"))
+        .Model(model => model.Id(p => p.ID))
+        .Create(update => update.Action("Ajax_Insert", "AccountEntry"))
+        .Update(update => update.Action("Ajax_Update", "AccountEntry"))
+        .Destroy(update => update.Action("Ajax_Delete", "AccountEntry"))
+    )
+    //.HtmlAttributes(new { @class = "k-window-custom" })
+)
+
+<script type="text/javascript">
+    $(function () {
+        var _grid = $("#Grid").data("kendoGrid");
+
+        var _types = '@Json.Encode(ViewBag.Types)';
+        jsonData = JSON.parse(_types.replace(/&quot;/g, '"'));
+
+        var _data = [];
+
+        _data.push({ title: 'Select Type' });
+        $.each(jsonData, function (key, value) {
+            _data.push({ title: value.Text });
+        });
+
+        _grid.bind("filterMenuInit", function (e) {
+            if (e.field == "TypeName") {
+                e.container.find("div.k-filter-help-text").text("Select type from the list:");
+                e.container.find("span.k-dropdown:first").css("display", "none");
+
+                var dropDownList = e.container.find(".k-textbox:first")
+                    .removeClass("k-textbox")
+                    .kendoDropDownList({
+                        dataSource: new kendo.data.DataSource({
+                            data: _data
+                        }),
+                        dataTextField: "title",
+                        dataValueField: "title"
+                    });
+            }
+        });
+    });
+
+    function error_handler(e) {
+        if (e.errors) {
+            var message = "Errors:\n";
+            $.each(e.errors, function (key, value) {
+                if ('errors' in value) {
+                    $.each(value.errors, function () {
+                        message += this + "\n";
+                    });
+                }
+            });
+            jAlertBox(message, "Error");
+            $('#Grid').data().kendoGrid.one('dataBinding', function (e) {
+                e.preventDefault();
+            })
+        }
+    }
+
+    function onChange(arg) {
+        if (arg.action != null) {
+            switch (arg.action) {
+                case 'sync': $("#Grid").data("kendoGrid").dataSource.read(); break;
+                default: break;
+            }
+        }
+    }
+
+    function DeleteUser(e) {
+        e.preventDefault();
+        var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+        jConfirmBox("Are you sure you want to delete this user?", "Confirm Delete", function (result) {
+            if (result) {
+                var loader = $('body').loading({ settings: { text: 'DELETING ENTRY..' } });
+                $.ajax({
+                    type: 'POST',
+                    url: '@Url.Action("Ajax_Delete", "AccountEntry")',
+                    contentType: 'application/json; charset=utf-8',
+                    data: '{ "id":"' + dataItem.ID + '"}',
+                    dataType: 'json',
+                    success: function (result) {
+                        loader.hideLoading();
+                        jsonText = JSON.stringify(result);
+                        data = JSON.parse(jsonText);
+                        if (data.Errors == null) {
+                            RefreshGrid();
+                        }
+                        else {
+                            jAlertBox(data.Errors.data_error.errors[0], "Error");
+                        }
+                    }
+                });
+            }
+        });
+    }
+
+    function RefreshGrid() {
+        $("#Grid").data("kendoGrid").dataSource.read();
+    }
+</script>

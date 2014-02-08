@@ -1,0 +1,90 @@
+﻿@{
+    ViewBag.Title = "System Login";
+    Layout = null;
+}
+
+<!DOCTYPE HTML>
+
+<html>
+
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=9" />
+
+    <link href='@Url.Content("~/Content/css/Login.css")' rel="stylesheet" />
+
+    <script src="@Url.Content("~/Scripts/jquery-1.7.1.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/jcambria-2.0.0.js")"></script>
+</head>
+
+<body>
+
+    <div id="top"></div>
+    <form id="login" class="box">
+        <div id="logo">
+            <embed src="@Url.Content("~/Content/svg/logo.svg")" type="image/svg+xml" />
+        </div>
+        <fieldset id="inputs">
+            <input id="username" type="text" placeholder="Username" autofocus required>   
+            <input id="password" type="password" placeholder="Password" required>
+        </fieldset>
+        <fieldset id="actions">
+            <input type="submit" id="submit" value="Log in">
+            @*<a href="#">Forgot your password?</a>*@
+        </fieldset>
+    </form>
+
+    <div id="bottom"></div>
+
+</body>
+
+<script type="text/javascript">
+    var proceed = true;
+    var url = '@ViewBag.Url';
+    if (url == '') {
+        url = '@Url.Action("Index", "Home")';
+    }
+    $(function () {
+
+        $('form').live('submit', function (event) {
+            event.preventDefault();
+            document.getElementById('submit').focus();
+            var username = $('#username').val();
+            var password = $('#password').val();
+            if (username.trim() == '' || password.trim() == '') {
+                jAlertBox('Username and password cannot be blank.');
+                return;
+            }
+            var loading = $('body').loading({ settings: { text: 'VERIFYING ACCOUNT... PLEASE WAIT' } });
+            $.ajax({
+                type: 'POST',
+                url: '@Url.Action("Login", "Login")',
+                contentType: 'application/json; charset=utf-8',
+                data: '{ "username":"' + username + '", "password":"' + password + '"}',
+                dataType: 'json',
+                success: function (result) {
+                    jsonText = JSON.stringify(result);
+                    data = JSON.parse(jsonText);
+                    if (data.Errors == null) {
+                        window.location = url;
+                    }
+                    else {
+                        loading.hideLoading();
+                        jAlertBox(data.Errors.data_error.errors[0], "Error", function () {
+                            $('#password').val('');
+                        });
+                    }
+                }
+            });
+
+        });
+
+        $('#btnPassword').toolTip("Email forgotten password.", { settings: { cursor: 'pointer' } });
+
+        $('#btnPassword').click(function () {
+            window.location = '@Url.Action("ForgotPassword","Login")';
+        });
+    });
+
+</script>
+
+</html>

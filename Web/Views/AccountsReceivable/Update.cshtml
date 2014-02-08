@@ -1,0 +1,239 @@
+﻿@{
+    Layout = "~/Views/Shared/_Window.cshtml";
+}
+
+@model Web.Models.CSalesInvoice
+
+<style>
+    .k-grid { width:750px; }
+    input[type='text'], input[type='password'] { width:200px; }
+    .form-label { width:120px; }
+    .k-pager-wrap { text-align:right; padding-right:30px; }
+    tbdody tr { height:30px; }
+</style>
+
+<div>
+    <form id="frmInvoice">
+        <input type="hidden" name="id" value="@Model.ID" />
+        <div class="k-widget k-grid" >
+            <table cellspacing="0">
+                <thead class="k-grid-header">
+                    <tr>
+                        <th class="k-header" colspan="4">Sales Invoice Information</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="form-label">Invoice No.:</td>
+                        <td>@Html.TextBox("invoiceno", Model.InvoiceNo, new { @maxlength = 50, style="width:100px;" })</td>
+                        <td class="form-label">Date Created:</td>
+                        <td>@Html.TextBox("dateadded", ((DateTime)Model.DateAdded).ToShortDateString(), new { @class = "j-datepicker" })</td>
+                    </tr>
+                    <tr>
+                        <td class="form-label">Project Code:</td>
+                        <td>@Html.TextBox("projectcode", Model.ProjectCode, new { @maxlength = 50, style="width:100px;" })</td>
+                        <td class="form-label">Business:</td>
+                        <td>@Html.TextBox("business", Model.Business, new { @maxlength = 250 })</td>
+                    </tr>
+                    <tr>
+                        <td class="form-label">Project:</td>
+                        <td>@Html.Partial(Url.Content("~/Views/Shared/EditorTemplates/_ProjectDropdown.cshtml"))</td>
+                        <td class="form-label">Terms:</td>
+                        <td>@Html.TextBox("terms", Model.Terms, new { @maxlength = 250 })</td>
+                    </tr>
+                    <tr>
+                        <td class="form-label">Customer:</td>
+                        <td>@Html.TextBox("customer", Model.Customer, new { @maxlength = 220 })</td>
+                        <td class="form-label">OSCA/PWD ID No:</td>
+                        <td>@Html.TextBox("pwdno", Model.PWDNo, new { @maxlength = 100 })</td>
+                    </tr>
+                    <tr>
+                        <td class="form-label">Address:</td>
+                        <td>@Html.TextBox("address", Model.Address, new { @maxlength = 250 })</td>
+                        <td class="form-label">SC/PWD Signature:</td>
+                        <td>@Html.TextBox("pwdsignature", Model.PWDSignature, new { @maxlength = 100 })</td>
+                    </tr>
+                    <tr>
+                        <td class="form-label">TIN:</td>
+                        <td>@Html.TextBox("tin", Model.TIN, new { @maxlength = 50 })</td>
+                        <td class="form-label">% Completion:</td>
+                        <td>
+                            <div id="sliderPercent" style="width:120px; margin:8px 10px; float:left;"></div>
+                            <div style="float:left;">
+                                @Html.TextBox("percentcompletion", Model.PercentCompletion, new { @style="width:25px;margin-left:10px;", @class = "j-numeric-only" })
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="form-label">Vatable:</td>
+                        <td>@Html.CheckBox("vatable")</td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr><td></td><td></td><td></td><td></td></tr>
+                </tbody>
+            </table>
+        </div>
+        <div style="text-align:right; padding:10px 0 0 0;">
+            <input type="button" id="btnSave" value="@(ViewBag.Mode == "CREATE" ? "Create Invoice" : "Save Changes")" class="k-button" />
+        </div>
+    </form>
+</div>
+
+<script type="text/javascript">
+    var mode = '@ViewBag.Mode';
+    var projects;
+    var timeoutId = 0;
+
+    $(function () {
+        //if (mode == 'EDIT')
+        //    FillupForm();
+        if ('@Model.IsSubmitted' == 'True') {
+            $('input').attr('disabled', 'disabled');
+            $('span').attr('disabled', 'disabled');
+            $('#btnSave').hide();
+        }
+
+        var _projects = '@Json.Encode(ViewBag.ProjectLookUp)';
+        projects = JSON.parse(_projects.replace(/&quot;/g, '"'));
+
+        $('#projectid').change(function () {
+            $('#projectcode').val(GetProjByID($(this).val()).Code);
+        });
+
+        $('#projectcode').on('input', function () {
+            clearTimeout(timeoutId);
+            timeoutId = setTimeout(SetProjectDropdown, 500);
+        });
+
+        $('#sliderPercent').slider({
+            min: 0,
+            max: 100,
+            animate: true,
+            range: "min",
+            slide: function (event, ui) {
+                $("#percentcompletion").val(ui.value);
+            }
+        });
+
+        $('#sliderPercent').slider('value', '@Model.PercentCompletion');
+
+        $('#percentcompletion').keyup(function () {
+            $('#sliderPercent').slider('value', $(this).val());
+        });
+
+        $('#btnSave').click(function () {
+            if ('@Model.IsSubmitted' == 'true') {
+                jAlertBox("Submitted invoices can no longer be changed", "Error");
+                return false;
+            }
+
+            //if ($('[name=projectid]').val().trim() == '') {
+            //    jAlertBox("Please select a project.", "Data Error");
+            //    return false;
+            //}
+
+            if ($('[name=customer]').val().trim() == '') {
+                jAlertBox("Please specify customer name.", "Data Error");
+                return false;
+            }
+
+            var toUrl;
+            var msg;
+            if (mode == 'EDIT') {
+                toUrl = '@Url.Action("Ajax_Update", "AccountsReceivable")';
+                msg = 'SAVING CHANGES TO THE INVOICE..';
+            }
+            else {
+                toUrl = '@Url.Action("Ajax_Insert", "AccountsReceivable")';
+                msg = 'CREATING NEW INVOICE..';
+            }
+
+            var loader = parent.$("body").loading({ settings: { text: msg } });
+            $.ajax({
+                type: 'POST',
+                url: toUrl,
+                data: $('#frmInvoice').serialize(),
+                success: function (result) {
+                    jsonText = JSON.stringify(result);
+                    data = JSON.parse(jsonText);
+                    if (data.Errors == null) {
+                        loader.hideLoading();
+                        saved(data.Data[0].ID);
+                    }
+                    else {
+                        loader.hideLoading();
+                        jAlertBox(data.Errors.data_error.errors[0], "Error");
+                    }
+                }
+            });
+        });
+    });
+
+    function GetProjByID(id) {
+        var L = projects.length;
+        for (var i = 0; i < L; i++) {
+            if (projects[i].ID == id) {
+                return projects[i];
+            }
+        }
+        return '';
+    }
+
+    function GetProjByCode(code) {
+        var L = projects.length;
+        for (var i = 0; i < L; i++) {
+            if (projects[i].Code.toLowerCase() == code.toLowerCase().trim()) {
+                return projects[i];
+            }
+        }
+        return null;
+    }
+
+    function FillupForm() {
+        //$('#txtFirstName').val('');
+    }
+
+    function saved(id) {
+        parent.RefreshGrid();
+        if (mode == 'CREATE') {
+            var actionUrl = '@Url.Action("Invoice", "AccountsReceivable", new { invoiceID = "PH1" })';
+            actionUrl = actionUrl.replace("PH1", id);
+            var loader = parent.$("body").loading({ settings: { text: "REDIRECTING TO INVOICE DETAILS..." } });
+            parent.Redirect(actionUrl);
+        }
+        else {
+            parent.CloseWindow();
+        }
+@*        var msg = 'Changes has been successfully saved.';
+        if (mode == 'CREATE') {
+            msg = 'New invoice has been successfully saved.';
+        }
+        jAlertBox(msg, "Saved", function () {
+            if (mode == 'CREATE') {
+                var actionUrl = '@Url.Action("Invoice", "AccountsReceivable", new { invoiceID = "PH1"})';
+                actionUrl = actionUrl.replace("PH1", id);
+                var loader = parent.$("body").loading({ settings: { text: "REDIRECTING TO INVOICE DETAILS..." } });
+                parent.Redirect(actionUrl);
+            }
+            else {
+                parent.CloseWindow();
+            }
+        });*@
+    }
+
+    function SetProjectDropdown() {
+        var proj = GetProjByCode($('#projectcode').val());
+        var dropdownlist = $("[name=projectid]").data("kendoDropDownList");
+        if (proj != null) {
+            dropdownlist.select(function (dataItem) {
+                return dataItem.Value === proj.ID.toString();
+            });
+        }
+        else {
+            dropdownlist.select(function (dataItem) {
+                return dataItem.Value === '';
+            });
+        }
+    }
+</script>

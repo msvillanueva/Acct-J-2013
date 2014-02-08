@@ -1,0 +1,305 @@
+﻿@{
+    Layout = "~/Views/Shared/_Secured.cshtml";
+}
+
+@using Web.Models
+@model CVoucher
+
+@if (Model == null)
+{
+    Response.Redirect(Url.Action("Index", "Home"), true);
+}
+
+<div class="k-widget k-grid">
+    <table cellspacing="0">
+        <thead class="k-grid-header">
+            <tr>
+                <th class="k-header" colspan="2">Voucher No: @Model.ID</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td style="width:25%;">Payee:</td>
+                <td>@Model.PayeeName</td>
+            </tr>
+            <tr class="k-alt">
+                <td>Particulars:</td>
+                <td>@Model.Remarks</td>
+            </tr>
+            <tr>
+                <td>Project:</td>
+                <td>@Model.ProjectConsolidated</td>
+            </tr>
+            <tr class="k-alt">
+                <td>Check Number:</td>
+                <td>@Model.CheckNo</td>
+            </tr>
+            <tr>
+                <td>Date Created:</td>
+                <td>@(((DateTime)Model.DateAdded).ToShortDateString())</td>
+            </tr>
+            <tr>
+                <td>Check Date:</td>
+                <td>@(((DateTime)Model.CheckDate).ToShortDateString())</td>
+            </tr>
+            <tr class="k-alt">
+                <td>Check Amount:</td>
+                <td>@String.Format("{0:n}", Model.CheckAmount)</td>
+            </tr>
+            <tr>
+                <td>Status:</td>
+                <td>@Model.Status</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+<br />
+@(Html.Kendo().Grid<CVoucherEntry>()
+    .Name("Grid")
+    .Columns(columns =>
+    {
+        columns.Bound(p => p.ID).Visible(false);
+        columns.Bound(p => p.AccountEntryCode).Title("Account Code").Width(100);
+        columns.Bound(p => p.AccountEntryName).Title("Account Title");
+        columns.Bound(p => p.ProjectCode).Title("Project");
+        columns.Bound(p => p.BankCode).Title("Bank");
+        columns.Bound(p => p.DateAdded).Title("Date Created").Format("{0:dd/MM/yy hh:mm}").Width(80);
+        columns.Bound(p => p.Debit).Title("Debit").HtmlAttributes(new { style = "text-align:right;" }).Width(120).Format("{0:n}");
+        columns.Bound(p => p.Credit).Title("Credit").HtmlAttributes(new { style = "text-align:right;" }).Width(120).Format("{0:n}");
+        columns.Command(command => { command.Custom("Edit").Click("EditRow"); command.Custom("Delete").Click("DeleteRow"); }).Width(160).Visible(!Model.Submitted && UserSession.Role != Web.Core.Enumerations.Role.SuperUser);
+    })
+    .ToolBar(t =>
+    {
+        t.Template(@<text>
+            <div style="float:left;display:@(Model.Submitted ? "none" : "block")">
+                <a id="btnAdd" class="k-button k-button-icontext">
+                    <span class="k-icon k-add"></span>
+                    Add new entry
+                </a>
+                <a id="btnSubmit" class="k-button k-button-icontext">
+                    <span class="k-icon k-file"></span>
+                    Submit entries
+                </a>
+            </div>
+            <div style="float:left;display:@(!Model.Submitted ? "none" : "block")">
+                <a id="btnPrint" class="k-button k-button-icontext" target="_blank" href='@Url.Content("~/Reports/ReportViewer.aspx?t=1&id=" + Model.ID)'>
+                    <span class="k-icon k-i-restore"></span>
+                    Print to PDF
+                </a>
+            </div>
+            <div style="float:left;display:@((Model.Submitted) ? "block" : "none")">
+                <a id="btnCheck" class="k-button k-button-icontext" target="_blank" href='@Url.Content("~/Reports/ReportViewer.aspx?t=4&id=" + Model.ID)'>
+                    <span class="k-icon k-delete"></span>
+                    Print Check
+                </a>
+            </div>
+            <div style="float:left;display:@((Model.Submitted && UserSession.Role == Web.Core.Enumerations.Role.SuperUser) ? "block" : "none")">
+                <a id="btnDeny" class="k-button k-button-icontext">
+                    <span class="k-icon k-delete"></span>
+                    Revert
+                </a>
+            </div>
+        </text>);
+    })
+    .Editable(editable => editable.Mode(GridEditMode.InLine))
+    .Sortable()
+    .Filterable(a => a.Extra(false))
+    .DataSource(dataSource => dataSource
+        .Ajax()
+        .PageSize(10)
+        .Read(read => read.Action("Ajax_ReadEntries", "AccountsPayable", new { voucherid = Model.ID }))
+        .Events(events => events.Error("error_handler").Change("onChange"))
+        .Model(model => model.Id(p => p.ID))
+    )
+)
+<div class="k-widget k-grid" style="display:@(Model.Submitted ? "block" : "none")" >
+    <table cellspacing="0">
+        <tbody>
+            <tr class="k-alt" data-uid="8570b935-8fb7-48eb-ac3a-54e217cc3452" role="row">
+                <td colspan="4" role="gridcell">Prepared by: @Model.AddedByName</td>
+                <td class="total_amount" style="text-align:right; width:104.625px;" role="gridcell">@String.Format("{0:n}",Model.Entries.Sum(a => a.Debit))</td>
+                <td class="total_amount" style="text-align:right; width:104.625px;" role="gridcell">@String.Format("{0:n}",Model.Entries.Sum(a => a.Credit))</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+<br />
+<br />
+
+@(Html.Kendo().Window() 
+    .Name("window") 
+    .Content("loading page..") 
+    .Iframe(true) 
+    .Draggable() 
+    .Visible(false) 
+    .Height(400) 
+    .Width(420) 
+    .Modal(true)
+)
+
+<script type="text/javascript">
+    $(function () {
+        var _grid = $("#Grid").data("kendoGrid");
+
+        CheckBalance();
+
+        $('#btnAdd').click(function () {
+            $('#window')
+                .data("kendoWindow")
+                .title("Add new entry")
+                .refresh({
+                    url: '@Url.Action("UpdateEntry", "AccountsPayable", new { voucherid = Model.ID })'
+                })
+                .center()
+                .open();
+        });
+
+        $('#btnSubmit').click(function () {
+            jConfirmBox("Are you sure you want to submit this voucher? <br/>Submitting this voucher will lock all entries.", "Confirm Action", function (result) {
+                if (result) {
+                    var loader = $('body').loading({ settings: { text: 'SUBMITTING VOUCHER..' } });
+                    $.ajax({
+                        type: 'POST',
+                        url: '@Url.Action("Ajax_SubmitVoucher", "AccountsPayable")',
+                        contentType: 'application/json; charset=utf-8',
+                        data: '{ "id":"' + '@Model.ID' + '"}',
+                        dataType: 'json',
+                        success: function (result) {
+                            loader.hideLoading();
+                            jsonText = JSON.stringify(result);
+                            data = JSON.parse(jsonText);
+                            if (data.Errors == null) {
+                                Submitted();
+                            }
+                            else {
+                                jAlertBox(data.Errors.data_error.errors[0], "Error");
+                            }
+                        }
+                    });
+                }
+            });
+        });
+
+        $('#btnDeny').click(function () {
+            jConfirmBox("Are you sure you want to deny this voucher? <br/>Denying this voucher will enable encding of entries.", "Confirm Action", function (result) {
+                if (result) {
+                    var loader = $('body').loading({ settings: { text: 'REVERTING VOUCHER..' } });
+                    $.ajax({
+                        type: 'POST',
+                        url: '@Url.Action("Ajax_DenyVoucher", "AccountsPayable")',
+                        contentType: 'application/json; charset=utf-8',
+                        data: '{ "id":"' + '@Model.ID' + '"}',
+                        dataType: 'json',
+                        success: function (result) {
+                            loader.hideLoading();
+                            jsonText = JSON.stringify(result);
+                            data = JSON.parse(jsonText);
+                            if (data.Errors == null) {
+                                Submitted();
+                            }
+                            else {
+                                jAlertBox(data.Errors.data_error.errors[0], "Error");
+                            }
+                        }
+                    });
+                }
+            });
+        });
+
+
+    });
+
+    function CheckBalance() {
+        if ('@Model.Submitted' == 'True') {
+            if ('@Model.Entries.Sum(a => a.Credit)' != '@Model.Entries.Sum(a => a.Debit)')
+                $('.total_amount').css('background-color', '#FF527D');
+        }
+    }
+
+    function error_handler(e) {
+        if (e.errors) {
+            var message = "Errors:\n";
+            $.each(e.errors, function (key, value) {
+                if ('errors' in value) {
+                    $.each(value.errors, function () {
+                        message += this + "\n";
+                    });
+                }
+            });
+            jAlertBox(message, "Error");
+            $('#Grid').data().kendoGrid.one('dataBinding', function (e) {
+                e.preventDefault();
+            })
+        }
+    }
+
+    function onChange(arg) {
+        if (arg.action != null) {
+            console.log(arg.action);
+            switch (arg.action) {
+                case 'sync': $("#Grid").data("kendoGrid").dataSource.read(); break;
+                default: break;
+            }
+        }
+    }
+
+    function DeleteRow(e) {
+        e.preventDefault();
+        var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+        jConfirmBox("Are you sure you want to delete this entry?", "Confirm Delete", function (result) {
+            if (result) {
+                var loader = $('body').loading({ settings: { text: 'DELETING ENTRY..' } });
+                $.ajax({
+                    type: 'POST',
+                    url: '@Url.Action("Ajax_DeleteEntry", "AccountsPayable")',
+                    contentType: 'application/json; charset=utf-8',
+                    data: '{ "id":"' + dataItem.ID + '"}',
+                    dataType: 'json',
+                    success: function (result) {
+                        loader.hideLoading();
+                        jsonText = JSON.stringify(result);
+                        data = JSON.parse(jsonText);
+                        if (data.Errors == null) {
+                            RefreshGrid();
+                        }
+                        else {
+                            jAlertBox(data.Errors.data_error.errors[0], "Error");
+                        }
+                    }
+                });
+            }
+        });
+    }
+
+    function EditRow(e) {
+        e.preventDefault();
+        var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+        var actionUrl = '@Url.Action("UpdateEntry", "AccountsPayable", new { voucherid = Model.ID, id = "PH1", mode = "EDIT"})';
+        actionUrl = actionUrl.replace("PH1", dataItem.ID);
+        actionUrl = actionUrl.replace(/amp;/g, "");
+        $('#window')
+            .data("kendoWindow")
+            .title("Edit voucher")
+            .refresh({
+                url: actionUrl
+            })
+            .center()
+            .open();
+    }
+
+    function RefreshGrid() {
+        $("#Grid").data("kendoGrid").dataSource.read();
+    }
+
+    function Submitted() {
+        window.location = '@Url.Action("Index", "AccountsPayable")';
+    }
+
+    function CloseWindow() {
+        $("#window").data("kendoWindow").close();
+    }
+
+    function Redirect(url) {
+        window.location = url;
+    }
+</script>

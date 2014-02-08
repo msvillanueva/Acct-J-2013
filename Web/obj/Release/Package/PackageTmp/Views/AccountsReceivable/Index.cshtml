@@ -1,0 +1,187 @@
+﻿@{
+    Layout = "~/Views/Shared/_Secured.cshtml";
+}
+
+@using Web.Models
+@model List<CUser>
+
+@(Html.Kendo().Grid<CSalesInvoice>()
+    .Name("Grid")
+    .Columns(columns =>
+    {
+        columns.Bound(p => p.ID).Title("No.").Width(50);
+        columns.Bound(p => p.ProjectName).Title("Project");        
+        columns.Bound(p => p.Customer).Title("Customer Name");
+        columns.Bound(p => p.AmountDue).Title("Amount Due").Width(80);
+        columns.Bound(p => p.PercentCompletion).Title("% Complete").Width(80);
+        columns.Bound(p => p.Status).Title("Status").Width(70);
+        columns.Bound(p => p.DateAdded).Title("Date Created").Format("{0:MM/dd/yy}").Width(70);
+        columns.Command(command => command.Custom("Details").Click("ShowDetails")).Width(80);
+        columns.Command(command => { command.Custom("Edit").Click("EditRow"); command.Custom("Delete").Click("DeleteRow"); }).Width(160).Visible(UserSession.Role == Web.Core.Enumerations.Role.Encoder);
+    })
+    .ToolBar(t =>
+    {
+        t.Template(@<text>
+            <div style="display:@(UserSession.Role != Web.Core.Enumerations.Role.SuperUser ? "block" : "none")">
+                <a id="btnAdd" class="k-button k-button-icontext">
+                    <span class="k-icon k-add"></span>
+                    Add new invoice
+                </a>
+            </div>
+        </text>);
+    })
+    .Editable(editable => editable.Mode(GridEditMode.InLine))
+    .Pageable()
+    //.Scrollable()
+    .Sortable()
+    .Filterable(a => a.Extra(false))
+    .DataSource(dataSource => dataSource
+        .Ajax()
+        .PageSize(10)
+        .Read(read => read.Action("Ajax_Read", "AccountsReceivable"))
+        .Events(events => events.Error("error_handler").Change("onChange"))
+        .Model(model => model.Id(p => p.ID))
+    )
+    //.HtmlAttributes(new { @class = "k-window-custom" })
+)
+
+@(Html.Kendo().Window() 
+    .Name("window") 
+    .Content("loading page..") 
+    .Iframe(true) 
+    .Draggable() 
+    .Visible(false) 
+    .Height(430) 
+    .Width(770) 
+    .Modal(true)
+)
+
+<script type="text/javascript">
+    $(function () {
+        var _grid = $("#Grid").data("kendoGrid");
+
+        _grid.bind("filterMenuInit", function (e) {
+            if (e.field == "Status") {
+                e.container.find("div.k-filter-help-text").text("Select a role from the list:");
+                e.container.find("span.k-dropdown:first").css("display", "none");
+
+                var dropDownList = e.container.find(".k-textbox:first")
+                    .removeClass("k-textbox")
+                    .kendoDropDownList({
+                        dataSource: new kendo.data.DataSource({
+                            data: [
+                                { title: "Select Status" },
+                                { title: "Pending" },
+                                { title: "Submitted" },
+                                { title: "Collected" }
+                            ]
+                        }),
+                        dataTextField: "title",
+                        dataValueField: "title"
+                    });
+            }
+        });
+
+        $('#btnAdd').click(function () {
+            $('#window')
+                .data("kendoWindow")
+                .title("Add new sales invoice")
+                .refresh({
+                    url: '@Url.Action("Update","AccountsReceivable")'
+                })
+                .center()
+                .open();
+        });
+
+    });
+
+    function error_handler(e) {
+        if (e.errors) {
+            var message = "Errors:\n";
+            $.each(e.errors, function (key, value) {
+                if ('errors' in value) {
+                    $.each(value.errors, function () {
+                        message += this + "\n";
+                    });
+                }
+            });
+            jAlertBox(message, "Error");
+            $('#Grid').data().kendoGrid.one('dataBinding', function (e) {
+                e.preventDefault();
+            })
+        }
+    }
+
+    function onChange(arg) {
+        if (arg.action != null) {
+            console.log(arg.action);
+            switch (arg.action) {
+                case 'sync': $("#Grid").data("kendoGrid").dataSource.read(); break;
+                default: break;
+            }
+        }
+    }
+
+    function DeleteRow(e) {
+        e.preventDefault();
+        var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+        jConfirmBox("Are you sure you want to delete this invoice?", "Confirm Delete", function (result) {
+            if (result) {
+                var loader = $('body').loading({ settings: { text: 'DELETING ENTRY..' } });
+                $.ajax({
+                    type: 'POST',
+                    url: '@Url.Action("Ajax_Delete", "AccountsReceivable")',
+                    contentType: 'application/json; charset=utf-8',
+                    data: '{ "id":"' + dataItem.ID + '"}',
+                    dataType: 'json',
+                    success: function (result) {
+                        loader.hideLoading();
+                        jsonText = JSON.stringify(result);
+                        data = JSON.parse(jsonText);
+                        if (data.Errors == null) {
+                            RefreshGrid();
+                        }
+                        else {
+                            jAlertBox(data.Errors.data_error.errors[0], "Error");
+                        }
+                    }
+                });
+            }
+        });
+    }
+
+    function EditRow(e) {
+        e.preventDefault();
+        var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+        var actionUrl = '@Url.Action("Update", "AccountsReceivable", new { id = "PH1", mode = "EDIT"})';
+        actionUrl = actionUrl.replace("PH1", dataItem.ID);
+        $('#window')
+            .data("kendoWindow")
+            .title("Edit invoice")
+            .refresh({
+                url: actionUrl
+            })
+            .center()
+            .open();
+    }
+
+    function ShowDetails(e) {
+        e.preventDefault();
+        var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+        var actionUrl = '@Url.Action("Invoice", "AccountsReceivable", new { invoiceID = "PH1"})';
+        actionUrl = actionUrl.replace("PH1", dataItem.ID);
+        window.location = actionUrl;
+    }
+
+    function RefreshGrid() {
+        $("#Grid").data("kendoGrid").dataSource.read();
+    }
+
+    function CloseWindow() {
+        $("#window").data("kendoWindow").close();
+    }
+
+    function Redirect(url) {
+        window.location = url;
+    }
+</script>

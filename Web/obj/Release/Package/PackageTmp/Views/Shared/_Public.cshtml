@@ -1,0 +1,118 @@
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=9" />
+
+
+    <title>Jaca Administration</title>
+
+	<link href="@Url.Content("~/Content/Custom.css")" rel="stylesheet" type="text/css" />
+	<link href="@Url.Content("~/Content/kendo/2013.1.319/kendo.common.min.css")" rel="stylesheet" type="text/css" />
+	<link href="@Url.Content("~/Content/kendo/2013.1.319/kendo.default.min.css")" rel="stylesheet" type="text/css" />
+    <link href="@Url.Content("~/Content/css/Site.css")" rel="stylesheet" type="text/css" />
+    <!--[if IE 8]><link href="@Url.Content("~/Content/css/ie8.css")" rel="stylesheet" type="text/css" /><![endif]-->
+
+	<script src="@Url.Content("~/Scripts/kendo/2013.1.319/jquery.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/jquery-1.7.1.min.js")"></script>
+
+	<script src="@Url.Content("~/Scripts/kendo/2013.1.319/kendo.all.min.js")"></script>
+	<script src="@Url.Content("~/Scripts/kendo/2013.1.319/kendo.aspnetmvc.min.js")"></script>
+	<script src="@Url.Content("~/Scripts/kendo.modernizr.custom.js")"></script>
+    <script src="@Url.Content("~/Scripts/jcambria-1.0.0.js")"></script>
+
+    
+    <script src="@Url.Content("~/Scripts/jquery.validate.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/jquery.validate.unobtrusive.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/jquery-ui-1.9.2.custom.min.js")"></script>
+
+    @*<script src="~/Scripts/jquery-1.7.1.min.js"></script>
+<script src="~/Scripts/jquery.validate.min.js"></script>
+<script src="~/Scripts/jquery.validate.unobtrusive.min.js"></script>
+<script src="~/Scripts/jquery-ui-1.9.2.custom.min.js"></script>
+<script src="~/Scripts/jcambria-1.0.0.js"></script>*@
+
+
+</head>
+
+<body>
+    <script type="text/javascript">
+        var winwidth = (screen.width || document.client.width);
+        if (winwidth < 1280)
+            document.write('<style>body{font-size:10px !important;}</style>');
+        else
+            document.write('<style>body{font-size:13px !important;}</style>');
+    </script>
+
+    <center>
+    <div class="page">
+        <form id="Form1" action="#">
+	    <!-- Fixed top -->
+	    <div id="top">
+		    <div class="fixed">
+			    <a class="logo">Jaca Administration</a>
+		    </div>
+	    </div>
+	    <!-- /fixed top -->
+            <br />
+        <div>
+            @RenderBody()
+        </div>
+	    <!-- Footer -->
+	    <div id="footer">
+		    <div class="copyrights">&copy;  JACA - 2013</div>
+	    </div>
+	    <!-- /footer -->
+        </form>
+    </div>
+    </center>
+</body>
+
+</html>
+
+
+
+<script type="text/javascript">
+    var proceed = true;
+    $(function () {
+
+        $('form').live('submit', function (event) {
+            event.preventDefault();
+            var username = $('#Username').val();
+            var password = $('#Password').val();
+            var loading = $('#account').loading({ settings: { text: 'VERIFYING ACCOUNT... PLEASE WAIT' } });
+            $.ajax({
+                type: 'POST',
+                url: '@Url.Action("Login", "Login")',
+                contentType: 'application/json; charset=utf-8',
+                data: '{ "username":"' + username + '", "password":"' + password + '"}',
+                dataType: 'json',
+                success: function (result) {
+                    jsonText = JSON.stringify(result);
+                    data = JSON.parse(jsonText);
+                    if (data.Errors == null) {
+                        window.location = '@Url.Action("Index", "Home")';
+                    }
+                    else {
+                        loading.hideLoading();
+                        jAlertBox(data.Errors.data_error.errors[0], "Error");
+                    }
+                }
+            });
+
+        });
+
+        $('#btnPassword').toolTip("Email forgotten password.", { settings: { cursor: 'pointer' } });
+
+        $('#btnPassword').click(function () {
+            window.location = '@Url.Action("ForgotPassword","Login")';
+        });
+    });
+
+</script>

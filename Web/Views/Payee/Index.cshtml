@@ -1,0 +1,102 @@
+﻿@{
+    Layout = "~/Views/Shared/_Secured.cshtml";
+}
+
+<style>
+    #Tin.text-box { width:100px; }
+    #Name.text-box { width:200px; }
+    #Address.text-box { width:300px; }
+</style>
+
+@using Web.Models
+@model List<CPayee>
+
+@(Html.Kendo().Grid<CPayee>()
+    .Name("Grid")
+    .Columns(columns =>
+    {
+        columns.Bound(p => p.ID).Visible(false);
+        columns.Bound(p => p.Name).Title("Payee Name");
+        columns.Bound(p => p.Address).Title("Address");
+        columns.Bound(p => p.Tin).Title("TIN").Width(100);
+        columns.Command(command => { command.Edit(); command.Custom("Delete").Click("DeleteUser"); }).Width(180);
+    })
+    .ToolBar(toolbar => toolbar.Create().Text("Add payee"))
+    .Editable(editable => editable.Mode(GridEditMode.InLine))
+    .Pageable()
+    //.Scrollable()
+    .Sortable()
+    .Filterable(a => a.Extra(false))
+    .DataSource(dataSource => dataSource
+        .Ajax()
+        .PageSize(10)
+        .Read(read => read.Action("Ajax_Read", "Payee"))
+        .Events(events => events.Error("error_handler").Change("onChange"))
+        .Model(model => model.Id(p => p.ID))
+        .Create(update => update.Action("Ajax_Insert", "Payee"))
+        .Update(update => update.Action("Ajax_Update", "Payee"))
+        .Destroy(update => update.Action("Ajax_Delete", "Payee"))
+    )
+    //.HtmlAttributes(new { @class = "k-window-custom" })
+)
+
+<script type="text/javascript">
+    function error_handler(e) {
+        if (e.errors) {
+            var message = "Errors:\n";
+            $.each(e.errors, function (key, value) {
+                if ('errors' in value) {
+                    $.each(value.errors, function () {
+                        message += this + "\n";
+                    });
+                }
+            });
+            jAlertBox(message, "Error");
+            $('#Grid').data().kendoGrid.one('dataBinding', function (e) {
+                e.preventDefault();
+            })
+        }
+    }
+
+    function onChange(arg) {
+        if (arg.action != null) {
+            console.log(arg.action);
+            switch (arg.action) {
+                case 'sync': $("#Grid").data("kendoGrid").dataSource.read(); break;
+                default: break;
+            }
+        }
+    }
+
+    function DeleteUser(e) {
+        e.preventDefault();
+        var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+        jConfirmBox("Are you sure you want to delete this bank?", "Confirm Delete", function (result) {
+            if (result) {
+                var loader = $('body').loading({ settings: { text: 'DELETING ENTRY..' } });
+                $.ajax({
+                    type: 'POST',
+                    url: '@Url.Action("Ajax_Delete", "Payee")',
+                    contentType: 'application/json; charset=utf-8',
+                    data: '{ "id":"' + dataItem.ID + '"}',
+                    dataType: 'json',
+                    success: function (result) {
+                        loader.hideLoading();
+                        jsonText = JSON.stringify(result);
+                        data = JSON.parse(jsonText);
+                        if (data.Errors == null) {
+                            RefreshGrid();
+                        }
+                        else {
+                            jAlertBox(data.Errors.data_error.errors[0], "Error");
+                        }
+                    }
+                });
+            }
+        });
+    }
+
+    function RefreshGrid() {
+        $("#Grid").data("kendoGrid").dataSource.read();
+    }
+</script>

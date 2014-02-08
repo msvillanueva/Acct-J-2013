@@ -1,0 +1,240 @@
+﻿@{
+    Layout = "~/Views/Shared/_Secured.cshtml";
+}
+
+@model List<Web.Core.Entities.Report>
+
+<div>
+    <div class="filter_row">
+        Date from:&nbsp;
+        @(Html.Kendo().DatePicker()
+                .Name("start")
+                .Value(new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1))
+                .Max((new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1)).AddMonths(1).AddDays(-1))
+                .Events(e => e.Change("startChange"))
+        )
+        &nbsp;&nbsp;to:&nbsp;
+        @(Html.Kendo().DatePicker()
+                .Name("end")
+                .Value((new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1)).AddMonths(1).AddDays(-1))
+                .Min(new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1))
+                .Events(e => e.Change("endChange"))
+        )
+    </div>
+    <div class="filter_row">
+        For project expenses:&nbsp;
+        @Html.Partial(Url.Content("~/Views/Shared/EditorTemplates/_ProjectDropdown.cshtml"))
+
+    </div>
+</div>
+<br />
+<br />
+
+@foreach (var report in Model)
+{
+    <a class="btnpnl" id="@report.ButtonCommand">
+        <div class="btnpnl-container">
+                <div class="btnpnl-icon">
+                </div>
+                <div class="btnpnl-description">
+                    <div class="title">@report.Title</div>
+                    <div class="desc">@report.Description</div>
+                </div>
+        </div>
+    </a>
+}
+
+
+@*<a class="btnpnl" id="btnCollections">
+    <div class="btnpnl-container">
+            <div class="btnpnl-icon">
+            </div>
+            <div class="btnpnl-description">
+                <div class="title">Collections Report</div>
+                <div class="desc">Summary of all collections.</div>
+            </div>
+    </div>
+</a>
+
+<a class="btnpnl" id="btnExpenses">
+    <div class="btnpnl-container">
+            <div class="btnpnl-icon">
+            </div>
+            <div class="btnpnl-description">
+                <div class="title">Expenses Report</div>
+                <div class="desc">Summary of expenses.</div>
+            </div>
+    </div>
+</a>
+
+<a class="btnpnl" id="btnSales">
+    <div class="btnpnl-container">
+            <div class="btnpnl-icon">
+            </div>
+            <div class="btnpnl-description">
+                <div class="title">Sales Report</div>
+                <div class="desc">Summary of all sales.</div>
+            </div>
+    </div>
+</a>
+
+<a class="btnpnl" id="btnBalanceSheet">
+    <div class="btnpnl-container">
+            <div class="btnpnl-icon">
+            </div>
+            <div class="btnpnl-description">
+                <div class="title">Balance Sheet Report</div>
+                <div class="desc">Balance Summary per project.</div>
+            </div>
+    </div>
+</a>
+
+<a class="btnpnl" id="btnTrialBalance">
+    <div class="btnpnl-container">
+            <div class="btnpnl-icon">
+            </div>
+            <div class="btnpnl-description">
+                <div class="title">Trial Balance Report</div>
+                <div class="desc"></div>
+            </div>
+    </div>
+</a>
+
+<a class="btnpnl" id="btnPostDatedCheck">
+    <div class="btnpnl-container">
+            <div class="btnpnl-icon">
+            </div>
+            <div class="btnpnl-description">
+                <div class="title">Post Dated Check</div>
+                <div class="desc">Summary of post dated check</div>
+            </div>
+    </div>
+</a>
+
+<a class="btnpnl" id="btnInputTax">
+    <div class="btnpnl-container">
+            <div class="btnpnl-icon">
+            </div>
+            <div class="btnpnl-description">
+                <div class="title">Input Tax</div>
+                <div class="desc">Summary of input taxes</div>
+            </div>
+    </div>
+</a>
+
+<a class="btnpnl" id="btnExpandedTax">
+    <div class="btnpnl-container">
+            <div class="btnpnl-icon">
+            </div>
+            <div class="btnpnl-description">
+                <div class="title">Expanded Tax</div>
+                <div class="desc">Summary of expanded taxes</div>
+            </div>
+    </div>
+</a>*@
+
+<script>
+    var start = "";
+    var end = "";
+
+    $(function () {
+        $('#btnCollections').click(function () {
+            var actionUrl = '@Url.Action("CollectionsReport", "Report", new { datefrom = "PH1", dateto = "PH2" })';
+            actionUrl = actionUrl.replace("PH1", $('#start').val());
+            actionUrl = actionUrl.replace("PH2", $('#end').val());
+            actionUrl = actionUrl.replace("amp;", '');
+            actionUrl = actionUrl.replace("amp;", '');
+            window.location = actionUrl;
+        });
+        $('#btnSales').click(function () {
+            var actionUrl = '@Url.Action("SalesReport", "Report", new { datefrom = "PH1", dateto = "PH2" })';
+            actionUrl = actionUrl.replace("PH1", $('#start').val());
+            actionUrl = actionUrl.replace("PH2", $('#end').val());
+            actionUrl = actionUrl.replace("amp;", '');
+            actionUrl = actionUrl.replace("amp;", '');
+            window.location = actionUrl;
+        });
+        $('#btnExpenses').click(function () {
+            if ($('[name=projectid]').val().trim() == '') {
+                jAlertBox("Please select a project.", "Data Error");
+                return false;
+            }
+            var actionUrl = '@Url.Action("ExpensesReport", "Report", new { projectid = "PH3", datefrom = "PH1", dateto = "PH2" })';
+            actionUrl = actionUrl.replace("PH1", $('#start').val());
+            actionUrl = actionUrl.replace("PH2", $('#end').val());
+            actionUrl = actionUrl.replace("PH3", $('[name=projectid]').val());
+            actionUrl = actionUrl.replace("amp;", '');
+            actionUrl = actionUrl.replace("amp;", '');
+            actionUrl = actionUrl.replace("amp;", '');
+            window.location = actionUrl;
+        });
+        $('#btnBalanceSheet').click(function () {
+            var actionUrl = '@Url.Action("BalanceSheetReport", "Report", new { datefrom = "PH1", dateto = "PH2" })';
+            actionUrl = actionUrl.replace("PH1", $('#start').val());
+            actionUrl = actionUrl.replace("PH2", $('#end').val());
+            actionUrl = actionUrl.replace("amp;", '');
+            actionUrl = actionUrl.replace("amp;", '');
+            window.location = actionUrl;
+        });
+        $('#btnTrialBalance').click(function () {
+            var actionUrl = '@Url.Action("TrialBalanceReport", "Report", new { datefrom = "PH1", dateto = "PH2" })';
+            actionUrl = actionUrl.replace("PH1", $('#start').val());
+            actionUrl = actionUrl.replace("PH2", $('#end').val());
+            actionUrl = actionUrl.replace("amp;", '');
+            actionUrl = actionUrl.replace("amp;", '');
+            window.location = actionUrl;
+        });
+        $('#btnPostDatedCheck').click(function () {
+            var actionUrl = '@Url.Action("PostDatedCheckReport", "Report", new { datefrom = "PH1", dateto = "PH2" })';
+            actionUrl = actionUrl.replace("PH1", $('#start').val());
+            actionUrl = actionUrl.replace("PH2", $('#end').val());
+            actionUrl = actionUrl.replace("amp;", '');
+            actionUrl = actionUrl.replace("amp;", '');
+            window.location = actionUrl;
+        });        
+        $('#btnInputTax').click(function () {
+            var actionUrl = '@Url.Action("InputTaxReport", "Report", new { datefrom = "PH1", dateto = "PH2" })';
+            actionUrl = actionUrl.replace("PH1", $('#start').val());
+            actionUrl = actionUrl.replace("PH2", $('#end').val());
+            actionUrl = actionUrl.replace("amp;", '');
+            actionUrl = actionUrl.replace("amp;", '');
+            window.location = actionUrl;
+        });
+        $('#btnExpandedTax').click(function () {
+            var actionUrl = '@Url.Action("ExpandedTaxReport", "Report", new {datefrom = "PH1", dateto = "PH2"})';
+            actionUrl = actionUrl.replace("PH1", $('#start').val());
+            actionUrl = actionUrl.replace("PH2", $('#end').val());
+            actionUrl = actionUrl.replace("amp;", '');
+            actionUrl = actionUrl.replace("amp;", '');
+            window.location = actionUrl;
+        });
+        $('#btnIncomeStatement').click(function () {
+            var actionUrl = '@Url.Action("IncomeStatementReport", "Report", new {datefrom = "PH1", dateto = "PH2"})';
+            actionUrl = actionUrl.replace("PH1", $('#start').val());
+            actionUrl = actionUrl.replace("PH2", $('#end').val());
+            actionUrl = actionUrl.replace("amp;", '');
+            actionUrl = actionUrl.replace("amp;", '');
+            window.location = actionUrl;
+        });
+    });
+
+    function startChange() {
+        var endPicker = $("#end").data("kendoDatePicker"),
+            startDate = this.value();
+        if (startDate) {
+            startDate = new Date(startDate);
+            startDate.setDate(startDate.getDate() + 1);
+            endPicker.min(startDate);
+        }
+    }
+
+    function endChange() {
+        var startPicker = $("#start").data("kendoDatePicker"),
+            endDate = this.value();
+        if (endDate) {
+            endDate = new Date(endDate);
+            endDate.setDate(endDate.getDate() - 1);
+            startPicker.max(endDate);
+        }
+    }
+</script>

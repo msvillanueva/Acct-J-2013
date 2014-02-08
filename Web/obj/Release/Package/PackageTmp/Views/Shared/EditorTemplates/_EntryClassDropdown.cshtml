@@ -1,0 +1,8 @@
+﻿@model string
+
+@(Html.Kendo().DropDownListFor(m => m)
+    .Name("ClassName")
+    .Value(Model)
+    .BindTo(ViewBag.Classes as List<SelectListItem>)
+    .OptionLabel("Select classification")
+)

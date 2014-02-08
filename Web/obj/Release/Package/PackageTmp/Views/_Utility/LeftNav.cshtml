@@ -1,0 +1,64 @@
+﻿@{
+    Layout = null;
+}
+
+@model List<Web.Models.CActionRoute>
+
+<ul class="navigation widget">
+    @foreach (var r in Model)
+    {
+        if (r.ChildrenCount > 0)
+        {
+            <li>
+                <a href="#" title="" class="expand">
+                    <i class='@r.Icon'></i>@r.Description
+                    <strong>@r.ChildrenCount</strong>
+                </a>
+                <ul>
+                    @foreach (var c in r.Children)
+                    {
+                        <li>
+                            <a href="@Url.Action(c.Action, c.Controller)" title="">@c.Description</a>
+                        </li>
+                    }
+                </ul>
+            </li>
+        }
+        else
+        {
+            <li>
+                <a href="@Url.Action(r.Action, r.Controller)" title="">
+                    <i class='@r.Icon'></i>@r.Description
+                </a>
+            </li>
+        }
+    }
+</ul>
+
+@*<ul class="navigation widget">
+	<li><a href="@Url.Action("Index", "Home")" title=""><i class="icon-home"></i>Dashboard</a></li>
+	<li><a href="@Url.Action("Index", "Product")" title=""><i class="icon-picture"></i>Manage Users</a></li>
+    <li><a href="@Url.Action("Index", "Resource")" title=""><i class="icon-paper-clip"></i>Resources</a></li>
+    <li><a href="@Url.Action("Index", "PresentationTemplate")" title=""><i class="icon-th"></i>Presentation Templates</a></li>
+	<li><a href="#" class="expand" title="Manage product specifications"><i class="icon-cogs"></i>Product Utility<strong>4</strong></a>
+		<ul>
+			<li><a href="@Url.Action("ProductCategory", "ProductManage")" title="">Categories</a></li>
+			<li><a href="@Url.Action("ProductShape", "ProductManage")" title="">Shape</a></li>
+			<li><a href="@Url.Action("ProductStyle", "ProductManage")" title="">Styles</a></li>
+			<li><a href="@Url.Action("ProductType", "ProductManage")" title="">Types</a></li>
+		</ul>
+	</li>
+	<li><a href="#" class="expand" title="Manage resource specifications"><i class="icon-wrench"></i>Resource Utility<strong>1</strong></a>
+		<ul>
+			<li><a href="@Url.Action("ResourceCategory", "ResourceManage")" title="">Categories</a></li>
+		</ul>
+	</li>
+	<li><a href="#" class="expand" title=""><i class="icon-user"></i>Users management<strong>2</strong></a>
+		<ul>
+			<li><a href="@Url.Action("ManageAdminUsers", "UserManage")" title="">Back-end Users</a></li>
+			<li><a href="@Url.Action("ManageDeviceUsers", "UserManage")" title="">Device Users</a></li>
+		</ul>
+	</li>
+</ul>*@
+
+

@@ -1,0 +1,168 @@
+﻿@{
+    Layout = "~/Views/Shared/_Window.cshtml";
+}
+
+<style>
+    .k-grid { width:400px; }
+    input[type='text'], input[type='password'] { width:200px; }
+    .form-label { width:120px; }
+    .k-pager-wrap { text-align:right; padding-right:30px; }
+    tr { height:30px; }
+</style>
+
+
+    <form id="frmUser">
+        <input type="hidden" name="id" value="@Model.ID" />
+        <div class="k-widget k-grid" >
+            <table cellspacing="0">
+                <thead class="k-grid-header">
+                    <tr>
+                        <th class="k-header" colspan="2">Account Information</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="form-label">First Name:</td>
+                        <td><input type="text" id="txtFirstName" name="firstname" maxlength="100" /></td>
+                    </tr>
+                    <tr>
+                        <td class="form-label">Middle Name:</td>
+                        <td><input type="text" id="txtMiddleName" name="middlename" maxlength="100" /></td>
+                    </tr>
+                    <tr>
+                        <td class="form-label">Last Name:</td>
+                        <td><input type="text" id="txtLastName" name="lastname" maxlength="100" /></td>
+                    </tr>
+                    <tr>
+                        <td class="form-label">Email:</td>
+                        <td><input type="text" id="txtEmail" name="email" maxlength="100" /></td>
+                    </tr>
+                    <tr>
+                        <td class="form-label">Account Type:</td>
+                        <td>
+                            @Html.Partial(Url.Content("~/Views/Shared/EditorTemplates/_RoleDropdown.cshtml"))
+                            &nbsp;
+                            @Html.Partial(Url.Content("~/Views/Shared/EditorTemplates/_StatusDropdown.cshtml"))
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="form-label">User Login Name:</td>
+                        <td><input type="text" id="txtUsername" name="username" maxlength="100" /></td>
+                    </tr>
+                    <tr>
+                        <td class="form-label">Password:</td>
+                        <td><input type="password" id="txtPassword" name="password" maxlength="100" /></td>
+                    </tr>
+                    <tr>
+                        <td class="form-label">Confirm Password:</td>
+                        <td><input type="password" id="txtPassword2" maxlength="100" /></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div style="text-align:right; padding:10px 0 0 0;">
+            <input type="button" id="btnSave" value="@(ViewBag.Mode == "CREATE" ? "Create User" : "Save Changes")" class="k-button" />
+        </div>
+    </form>
+
+<script type="text/javascript">
+    var mode = '@ViewBag.Mode';
+
+    $(function () {
+        if (mode == 'EDIT')
+            FillupForm();
+
+        $('#btnSave').click(function () {
+            if ($('#txtFirstName').val().trim() == '') {
+                jAlertBox("First name is required", "Data Error");
+                return false;
+            }
+
+            if ($('#txtLastName').val().trim() == '') {
+                jAlertBox("Last name is required", "Data Error");
+                return false;
+            }
+
+            if ($('#txtEmail').val().trim() == '') {
+                jAlertBox("Email is required", "Data Error");
+                return false;
+            }
+            else {
+                if (!validateEmail($('#txtEmail').val().trim())) {
+                    jAlertBox("Invalid email", "Data Error");
+                    return false;
+                }
+            }
+
+            if ($('[name=role]').val().trim() == '') {
+                jAlertBox("Please select a role.", "Data Error");
+                return false;
+            }
+
+            if ($('#txtUsername').val().trim() == '') {
+                jAlertBox("Username is required", "Data Error");
+                return false;
+            }
+
+            if ($('#txtPassword').val() != $('#txtPassword2').val()) {
+                jAlertBox("Passwords are not matched.", "Data Error");
+                return false;
+            }
+
+            var toUrl;
+            var msg;
+            if (mode == 'EDIT') {
+                toUrl = '@Url.Action("Ajax_Update", "User")';
+                msg = 'SAVING CHANGES TO THE USER..';
+            }
+            else {
+                toUrl = '@Url.Action("Ajax_Insert", "User")';
+                msg = 'CREATING NEW USER..';
+                if ($('#txtPassword').val().trim() == '') {
+                    jAlertBox("Password is required", "Data Error");
+                    return false;
+                }
+            }
+
+            var loader = parent.$("body").loading({ settings: { text: msg } });
+            $.ajax({
+                type: 'POST',
+                url: toUrl,
+                data: $('#frmUser').serialize(),
+                success: function (result) {
+                    jsonText = JSON.stringify(result);
+                    data = JSON.parse(jsonText);
+                    if (data.Errors == null) {
+                        loader.hideLoading();
+                        saved();
+                    }
+                    else {
+                        loader.hideLoading();
+                        jAlertBox(data.Errors.data_error.errors[0], "Error");
+                    }
+                }
+            });
+        });
+    });
+
+    function FillupForm() {
+        $('#txtFirstName').val('@Model.Firstname');
+        $('#txtMiddleName').val('@Model.Middlename');
+        $('#txtLastName').val('@Model.Lastname');
+        $('#txtEmail').val('@Model.Email');
+        $('#txtUsername').val('@Model.Username');
+        $('#txtUsername').attr('disabled', 'disabled');
+    }
+
+    function saved() {
+        parent.RefreshGrid();
+        var msg = 'Changes has been successfully saved.';
+        if (mode == 'CREATE') {
+            msg = 'New user has been successfully saved.';
+        }
+        jAlertBox(msg, "Saved", function () {
+            parent.CloseWindow();
+        });
+    }
+
+</script>

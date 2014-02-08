@@ -1,0 +1,5 @@
+﻿@(Html.Kendo().DropDownList()
+    .Name("status")
+    .Items(a => { a.Add().Value("Active").Text("Active"); a.Add().Value("Inactive").Text("Inactive"); })
+    .HtmlAttributes(new { style="width:90px;" })
+)

@@ -1,0 +1,111 @@
+div#loader_screen_generated
+{
+	opacity:0.8;
+	background-color:#000000;
+	text-align:center;
+	position:absolute;
+	z-index:90000;
+	color:#00540a;
+    font-size:16px;
+}
+
+div.tooltip_generated
+{
+	background-color:#D9D9D9;
+	display:none;
+	color:#000;
+	z-index:10000;
+	padding:5px 10px;
+	font-size:10px;
+	max-width:300px;
+	-moz-border-radius:5px;
+	-webkit-border-radius:5px;
+	border-radius:5px;
+	font-family:Arial;
+	border:solid 1px #C9C9C9
+}
+
+
+div#bg_box_generated
+{
+	background-color:#000;
+	z-index:90000;
+	position:absolute;
+	top:0px;
+	left:0px;
+	opacity:0.9
+}
+
+
+#msg_box_container_generated
+{
+    z-index: 90001;
+    position: absolute;
+    background-color: #DEDEDE;
+    border-color: #A8A8A8;
+    border-width: 1px;
+    border-style: solid;
+    padding: 10px 12px 5px 12px;
+    font-family: "Courier New", Courier, monospace;
+    font-size: 16px;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    border-radius: 5px;
+    box-shadow: 0px 3px 11px #666;
+   -webkit-box-shadow: 0px 3px 11px #666;
+   -moz-box-shadow: 0px 3px 11px #666;
+}
+#msg_box_title_generated{
+	background-color:#CFCFCF;
+	border-color:#A8A8A8;
+	border-width:1px;
+	border-style:solid;				
+	padding:3px 10px;
+	min-width:250px;
+	vertical-align:middle;
+	font-weight:bold;
+	-moz-border-radius:5px;
+	-webkit-border-radius:5px;
+	border-radius:5px				
+}
+#msg_box_content_generated {
+	background-color:#DEDEDE;
+	border-color:#A8A8A8;
+	border-width:1px;
+	border-style:solid;			
+	margin-top:10px;
+	padding:0px 5px;
+	-moz-border-radius:5px;
+	-webkit-border-radius:5px;
+	border-radius:5px				
+}	
+#msg_panel_generated {
+	padding:10px;
+	font-size:12px;
+	font-weight:normal
+}			
+#button_container_generated {
+	text-align:center;
+	margin:10px 0px 5px 0px
+}	
+.box_button_generated {
+	border-color:#A8A8A8;
+	border-width:1px;
+	border-style:solid;
+	cursor:pointer;
+	padding:3px 15px;
+	font-size:14px;
+	font-weight:bold;
+	-moz-border-radius:3px;
+	-webkit-border-radius:3px;
+	border-radius:3px;
+}
+a.box_button_generated
+{
+    color:#333;
+}
+a.box_button_generated:hover
+{
+    color:#000;
+    background-color:#C4C4C4;
+}

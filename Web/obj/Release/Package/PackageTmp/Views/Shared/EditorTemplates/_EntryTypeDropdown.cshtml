@@ -1,0 +1,8 @@
+﻿@model string
+
+@(Html.Kendo().DropDownListFor(m => m)
+    .Name("TypeName")
+    .Value(Model)
+    .BindTo(ViewBag.Types as List<SelectListItem>)
+    .OptionLabel("Select type")
+)

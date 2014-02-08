@@ -1,0 +1,6 @@
+﻿@(Html.Kendo().DropDownList()
+    .Name("payeeid")
+    .BindTo(ViewBag.Payees as List<SelectListItem>)
+    .OptionLabel("Select Payee")
+    .HtmlAttributes(new { style="width:250px;" })
+)

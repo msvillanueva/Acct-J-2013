@@ -1,0 +1,38 @@
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <meta http-equiv="X-UA-Compatible" content="IE=9" />
+
+	<link href="@Url.Content("~/Content/css/Custom.css")" rel="stylesheet" type="text/css" />
+	<link href="@Url.Content("~/Content/kendo/2013.1.319/kendo.common.min.css")" rel="stylesheet" type="text/css" />
+	<link href="@Url.Content("~/Content/kendo/2013.1.319/kendo.dataviz.min.css")" rel="stylesheet" type="text/css" />
+	<link href="@Url.Content("~/Content/kendo/2013.1.319/kendo.default.min.css")" rel="stylesheet" type="text/css" />
+	<link href="@Url.Content("~/Content/kendo/2013.1.319/kendo.dataviz.default.min.css")" rel="stylesheet" type="text/css" />
+
+	<script src="@Url.Content("~/Scripts/kendo/2013.1.319/jquery.min.js")"></script>
+	<script src="@Url.Content("~/Scripts/kendo/2013.1.319/kendo.all.min.js")"></script>
+	<script src="@Url.Content("~/Scripts/kendo/2013.1.319/kendo.aspnetmvc.min.js")"></script>
+	<script src="@Url.Content("~/Scripts/kendo.modernizr.custom.js")"></script>
+    <script src="@Url.Content("~/Scripts/jcambria-2.0.0.js")"></script>
+
+    <script src="@Url.Content("~/Scripts/jquery.validate.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/jquery.validate.unobtrusive.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/jquery-ui-1.9.2.custom.min.js")"></script>
+
+    <script src="@Url.Content("~/Scripts/js/plugins/ui/jquery.easytabs.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/js/plugins/ui/jquery.collapsible.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/js/files/bootstrap.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/Custom.js")"></script>
+</head>
+<body>
+    <div>
+        @RenderBody()
+    </div>
+</body>
+</html>

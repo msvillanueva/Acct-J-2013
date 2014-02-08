@@ -1,0 +1,44 @@
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+
+    <title>Session Expired</title>
+
+    <link href='@Url.Content("~/Content/css/Login.css")' rel="stylesheet" />
+
+    <style>
+        a { -moz-border-radius:5px; -webkit-border-radius:5px; border-radius:5px; border: 1px solid #888; padding:3px 5px; background-color:#dedede; }
+        a:hover { background-color: #C4C4C4; }
+        .co_name { font-family:'Times New Roman'; font-size:14px; font-weight:bold; color: #006622; }
+    </style>
+</head>
+<body>
+    <div style="width:100%;padding:10% 0 0 0;">
+        <div style="width:300px; margin:0 auto; text-align:center;">
+            <div>Your login session to<br /><span class="co_name">JACA</span> Accounting System<br />has expired</div>
+            <br />
+            <div>
+                <a onclick="invokeLogin()" style="cursor:pointer;">Click here to login</a>
+            </div>
+        </div>
+    </div>
+</body>
+
+<script>
+
+
+    function invokeLogin() {
+        var toUrl = '@ViewBag.Url';
+        var actionUrl = '@Url.Action("Index", "Login", new { url = "PH1"})';
+        actionUrl = actionUrl.replace("PH1", toUrl);
+        window.parent.window.location = actionUrl;
+    }
+</script>
+
+</html>

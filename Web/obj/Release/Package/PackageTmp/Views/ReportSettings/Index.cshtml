@@ -1,0 +1,60 @@
+﻿@{
+    Layout = "~/Views/Shared/_Secured.cshtml";
+}
+
+@model List<Web.Core.Entities.Report>
+@{var permissions = (List<Web.Core.Entities.ReportPermission>)ViewBag.Permissions;}
+
+<style>
+    tr.report-table td { padding:5px 10px; }
+</style>
+
+<input type="hidden" value="@ViewBag.RoleID" id="roleID" />
+<div>
+    <table>
+        @foreach (var report in Model)
+        {
+            var allowed = false;
+            var permission = permissions.FirstOrDefault(a => a.RoleID == (int)ViewBag.RoleID && a.ReportID == report.ID);
+            if (permission != null)
+            {
+                allowed = permission.Allowed;
+            }
+            <tr class="report-table">
+                <td><input type="checkbox" value="@report.ID" class="chkReport" @(allowed ? "checked" : "") /></td>
+                <td><strong>@report.Title</strong></td>
+                <td>@report.Description</td>
+            </tr>
+
+        }
+    </table>
+</div>
+
+<script>
+    $(function () {
+        $('.chkReport').click(function () {
+            var checked = $(this).is(':checked');
+            var id = $(this).val();
+            var roleid = $('#roleID').val();
+
+            $.ajax({
+                type: 'POST',
+                url: '@Url.Action("Update", "ReportSettings")',
+                contentType: 'application/json; charset=utf-8',
+                data: '{ "reportid":"' + id + '","roleid":"' + roleid + '","allowed":"' + checked + '"}',
+                dataType: 'json',
+                success: function (result) {
+                    loader.hideLoading();
+                    jsonText = JSON.stringify(result);
+                    data = JSON.parse(jsonText);
+                    if (data.Errors == null) {
+                        RefreshGrid();
+                    }
+                    else {
+                        jAlertBox(data.Errors.data_error.errors[0], "Error");
+                    }
+                }
+            });
+        });
+    });
+</script>

@@ -1,0 +1,249 @@
+﻿@{
+    Layout = "~/Views/Shared/_Window.cshtml";
+}
+
+@model Web.Models.CVoucher
+
+<style>
+    .k-grid { width:400px; }
+    input[type='text'], input[type='password'] { width:200px; }
+    .form-label { width:120px; }
+    .k-pager-wrap { text-align:right; padding-right:30px; }
+    tbdody tr { height:30px; }
+</style>
+
+<div style="height:380px;" class="window-form">
+    <form id="frmVoucher">
+        <input type="hidden" name="id" value="@Model.ID" />
+        <div class="k-widget k-grid" >
+            <table cellspacing="0">
+                <thead class="k-grid-header">
+                    <tr>
+                        <th class="k-header" colspan="2">Voucher Information</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="form-label">Project Code:</td>
+                        <td>
+                            @Html.TextBox("projectcode", Model.ProjectCode, new { @maxlength = 50, style="width:100px;" })
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="form-label">Project:</td>
+                        <td>
+                            @Html.Partial(Url.Content("~/Views/Shared/EditorTemplates/_ProjectDropdown.cshtml"))
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="form-label">Payee:</td>
+                        <td>
+                            @Html.Partial(Url.Content("~/Views/Shared/EditorTemplates/_PayeeDropdown.cshtml"))
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="form-label">Particular:</td>
+                        <td>@Html.TextBox("remarks", Model.Remarks, new { @maxlength = 200 })</td>
+                    </tr>
+                    <tr>
+                        <td class="form-label">Date Created:</td>
+                        <td>
+                            @Html.TextBox("dateadded", ((DateTime)Model.DateAdded).ToShortDateString(), new { @class = "j-datepicker" })
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="form-label">Check Date:</td>
+                        <td>
+                            @Html.TextBox("checkdate", ((DateTime)Model.CheckDate).ToShortDateString(), new { @class = "j-datepicker" })
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="form-label">Check Number:</td>
+                        <td>@Html.TextBox("checkno", Model.CheckNo, new { @maxlength = 100 })</td>
+                    </tr>
+                    <tr>
+                        <td class="form-label">Check Amount:</td>
+                        <td>
+                            @(Html.Kendo().NumericTextBox<float>()
+                                .Name("checkamount")
+                                .Placeholder("0")
+                                .HtmlAttributes(new { @class = "kui-numeric", @style = "width:150px;" })
+                                .Min(0)
+                            )   
+                        </td>
+                    </tr>
+                    @if (ViewBag.Mode != "EDIT")
+                    {
+                        <tr>
+                            <td class="form-label">EWT:</td>
+                            <td>
+                                @(Html.Kendo().NumericTextBox<float>()
+                                    .Name("ewt")
+                                    .Placeholder("0")
+                                    .HtmlAttributes(new { @class = "kui-numeric", @style = "width:70px;" })
+                                    .Min(0)
+                                    .Max(100)
+                                )&nbsp;%
+                            </td>
+                        </tr>
+                    }
+                    <tr><td></td><td></td></tr>
+                </tbody>
+            </table>
+        </div>
+        <div style="text-align:right; padding:10px 0 0 0;">
+            <span style="position:absolute; left:0; font-size:13px; display: @(ViewBag.Mode != "EDIT" ? "block" : "none")">
+                @Html.CheckBox("inputtax")&nbsp;Insert input tax
+            </span>
+            <input type="button" id="btnSave" value="@(ViewBag.Mode == "CREATE" ? "Create Voucher" : "Save Changes")" class="k-button" />
+        </div>
+    </form>
+</div>
+
+<script type="text/javascript">
+    var mode = '@ViewBag.Mode';
+    var projects;
+    var timeoutId = 0;
+
+    $(function () {
+        //if (mode == 'EDIT')
+        //    FillupForm();
+
+        if ('@Model.Submitted' == 'True') {
+            $('input').attr('disabled', 'disabled');
+            $('span').attr('disabled', 'disabled');
+            $('#btnSave').hide();
+        }
+
+        var _projects = '@Json.Encode(ViewBag.ProjectLookUp)';
+        projects = JSON.parse(_projects.replace(/&quot;/g, '"'));
+
+        $('#projectid').change(function () {
+            $('#projectcode').val(GetProjByID($(this).val()).Code);
+        });
+
+        $('#projectcode').on('input', function () {
+            clearTimeout(timeoutId);
+            timeoutId = setTimeout(SetProjectDropdown, 500);
+        });
+
+        $('#btnSave').click(function () {
+            if ('@Model.Submitted' == 'true') {
+                jAlertBox("Submitted vouchers can no longer be changed", "Error");
+                return false;
+            }
+
+            if ($('#remarks').val().trim() == '') {
+                jAlertBox("Particulars is required", "Data Error");
+                return false;
+            }
+
+            if ($('[name=payeeid]').val().trim() == '') {
+                jAlertBox("Please select payee.", "Data Error");
+                return false;
+            }
+
+            if ($('[name=projectid]').val().trim() == '') {
+                jAlertBox("Please select a project.", "Data Error");
+                return false;
+            }
+
+            var toUrl;
+            var msg;
+            if (mode == 'EDIT') {
+                toUrl = '@Url.Action("Ajax_Update", "AccountsPayable")';
+                msg = 'SAVING CHANGES TO THE VOUCHER..';
+            }
+            else {
+                toUrl = '@Url.Action("Ajax_Insert", "AccountsPayable")';
+                msg = 'CREATING NEW VOUCHER..';
+            }
+
+            var loader = parent.$("body").loading({ settings: { text: msg } });
+            $.ajax({
+                type: 'POST',
+                url: toUrl,
+                data: $('#frmVoucher').serialize(),
+                success: function (result) {
+                    jsonText = JSON.stringify(result);
+                    data = JSON.parse(jsonText);
+                    if (data.Errors == null) {
+                        loader.hideLoading();
+                        saved(data.Data[0].ID);
+                    }
+                    else {
+                        loader.hideLoading();
+                        jAlertBox(data.Errors.data_error.errors[0], "Error");
+                    }
+                }
+            });
+        });
+    });
+
+    function GetProjByID(id) {
+        var L = projects.length;
+        for (var i = 0; i < L; i++) {
+            if (projects[i].ID == id) {
+                return projects[i];
+            }
+        }
+        return '';
+    }
+
+    function GetProjByCode(code) {
+        var L = projects.length;
+        for (var i = 0; i < L; i++) {
+            if (projects[i].Code.toLowerCase() == code.toLowerCase().trim()) {
+                return projects[i];
+            }
+        }
+        return null;
+    }
+
+    function FillupForm() {
+        //$('#txtFirstName').val('');
+    }
+
+    function saved(id) {
+        parent.RefreshGrid();
+        //var msg = 'Changes has been successfully saved.';
+        //if (mode == 'CREATE') {
+        //    msg = 'New voucher has been successfully saved.';
+        //}
+        @*        jAlertBox(msg, "Saved", function () {
+            if (mode == 'CREATE') {
+                var actionUrl = '@Url.Action("Voucher", "AccountsPayable", new { voucherID = "PH1"})';
+                actionUrl = actionUrl.replace("PH1", id);
+                var loader = parent.$("body").loading({ settings: { text: "REDIRECTING TO VOUCHER DETAILS..." } });
+                parent.Redirect(actionUrl);
+            }
+            else {
+                parent.CloseWindow();
+            }
+        });*@
+        if (mode == 'CREATE') {
+            var actionUrl = '@Url.Action("Voucher", "AccountsPayable", new { voucherID = "PH1" })';
+            actionUrl = actionUrl.replace("PH1", id);
+            var loader = parent.$("body").loading({ settings: { text: "REDIRECTING TO VOUCHER DETAILS..." } });
+            parent.Redirect(actionUrl);
+        }
+        else {
+            parent.CloseWindow();
+        }
+    }
+
+    function SetProjectDropdown() {
+        var proj = GetProjByCode($('#projectcode').val());
+        var dropdownlist = $("[name=projectid]").data("kendoDropDownList");
+        if (proj != null) {
+            dropdownlist.select(function (dataItem) {
+                return dataItem.Value === proj.ID.toString();
+            });
+        }
+        else {
+            dropdownlist.select(function (dataItem) {
+                return dataItem.Value === '';
+            });
+        }
+    }
+</script>

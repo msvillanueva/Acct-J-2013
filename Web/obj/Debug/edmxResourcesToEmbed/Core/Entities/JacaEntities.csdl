@@ -1,0 +1,571 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Schema Namespace="JacaProjCostModel" Alias="Self" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns="http://schemas.microsoft.com/ado/2008/09/edm">
+  <EntityContainer Name="JacaEntities" annotation:LazyLoadingEnabled="true">
+    <EntitySet Name="AccountEntries" EntityType="JacaProjCostModel.AccountEntry" />
+    <EntitySet Name="Banks" EntityType="JacaProjCostModel.Bank" />
+    <EntitySet Name="Projects" EntityType="JacaProjCostModel.Project" />
+    <EntitySet Name="Users" EntityType="JacaProjCostModel.User" />
+    <EntitySet Name="RolePermissions" EntityType="JacaProjCostModel.RolePermission" />
+    <EntitySet Name="SystemLogs" EntityType="JacaProjCostModel.SystemLog" />
+    <AssociationSet Name="FK_SystemLog_User" Association="JacaProjCostModel.FK_SystemLog_User">
+      <End Role="User" EntitySet="Users" />
+      <End Role="SystemLog" EntitySet="SystemLogs" />
+    </AssociationSet>
+    <EntitySet Name="ActionRoutes" EntityType="JacaProjCostModel.ActionRoute" />
+    <AssociationSet Name="FK_ActionRoute_ActionRoute" Association="JacaProjCostModel.FK_ActionRoute_ActionRoute">
+      <End Role="ActionRoute" EntitySet="ActionRoutes" />
+      <End Role="ActionRoute1" EntitySet="ActionRoutes" />
+    </AssociationSet>
+    <AssociationSet Name="FK_RolePermission_ActionRoute" Association="JacaProjCostModel.FK_RolePermission_ActionRoute">
+      <End Role="ActionRoute" EntitySet="ActionRoutes" />
+      <End Role="RolePermission" EntitySet="RolePermissions" />
+    </AssociationSet>
+    <EntitySet Name="Payees" EntityType="JacaProjCostModel.Payee" />
+    <EntitySet Name="Vouchers" EntityType="JacaProjCostModel.Voucher" />
+    <EntitySet Name="VoucherEntries" EntityType="JacaProjCostModel.VoucherEntry" />
+    <AssociationSet Name="FK_VoucherEntry_AccountEntry" Association="JacaProjCostModel.FK_VoucherEntry_AccountEntry">
+      <End Role="AccountEntry" EntitySet="AccountEntries" />
+      <End Role="VoucherEntry" EntitySet="VoucherEntries" />
+    </AssociationSet>
+    <AssociationSet Name="FK_Voucher_Payee" Association="JacaProjCostModel.FK_Voucher_Payee">
+      <End Role="Payee" EntitySet="Payees" />
+      <End Role="Voucher" EntitySet="Vouchers" />
+    </AssociationSet>
+    <AssociationSet Name="FK_Voucher_Project" Association="JacaProjCostModel.FK_Voucher_Project">
+      <End Role="Project" EntitySet="Projects" />
+      <End Role="Voucher" EntitySet="Vouchers" />
+    </AssociationSet>
+    <AssociationSet Name="FK_Voucher_User" Association="JacaProjCostModel.FK_Voucher_User">
+      <End Role="User" EntitySet="Users" />
+      <End Role="Voucher" EntitySet="Vouchers" />
+    </AssociationSet>
+    <AssociationSet Name="FK_VoucherEntry_User" Association="JacaProjCostModel.FK_VoucherEntry_User">
+      <End Role="User" EntitySet="Users" />
+      <End Role="VoucherEntry" EntitySet="VoucherEntries" />
+    </AssociationSet>
+    <AssociationSet Name="FK_VoucherEntry_Voucher" Association="JacaProjCostModel.FK_VoucherEntry_Voucher">
+      <End Role="Voucher" EntitySet="Vouchers" />
+      <End Role="VoucherEntry" EntitySet="VoucherEntries" />
+    </AssociationSet>
+    <AssociationSet Name="FK_VoucherEntry_Bank" Association="JacaProjCostModel.FK_VoucherEntry_Bank">
+      <End Role="Bank" EntitySet="Banks" />
+      <End Role="VoucherEntry" EntitySet="VoucherEntries" />
+    </AssociationSet>
+    <EntitySet Name="SalesInvoices" EntityType="JacaProjCostModel.SalesInvoice" />
+    <EntitySet Name="SalesInvoiceEntries" EntityType="JacaProjCostModel.SalesInvoiceEntry" />
+    <AssociationSet Name="FK_SalesInvoice_Project" Association="JacaProjCostModel.FK_SalesInvoice_Project">
+      <End Role="Project" EntitySet="Projects" />
+      <End Role="SalesInvoice" EntitySet="SalesInvoices" />
+    </AssociationSet>
+    <AssociationSet Name="FK_SalesInvoice_User" Association="JacaProjCostModel.FK_SalesInvoice_User">
+      <End Role="User" EntitySet="Users" />
+      <End Role="SalesInvoice" EntitySet="SalesInvoices" />
+    </AssociationSet>
+    <AssociationSet Name="FK_SalesInvoiceEntry_SalesInvoice" Association="JacaProjCostModel.FK_SalesInvoiceEntry_SalesInvoice">
+      <End Role="SalesInvoice" EntitySet="SalesInvoices" />
+      <End Role="SalesInvoiceEntry" EntitySet="SalesInvoiceEntries" />
+    </AssociationSet>
+    <AssociationSet Name="FK_SalesInvoiceEntry_User" Association="JacaProjCostModel.FK_SalesInvoiceEntry_User">
+      <End Role="User" EntitySet="Users" />
+      <End Role="SalesInvoiceEntry" EntitySet="SalesInvoiceEntries" />
+    </AssociationSet>
+    <AssociationSet Name="FK_SalesInvoiceEntry_Project" Association="JacaProjCostModel.FK_SalesInvoiceEntry_Project">
+      <End Role="Project" EntitySet="Projects" />
+      <End Role="SalesInvoiceEntry" EntitySet="SalesInvoiceEntries" />
+    </AssociationSet>
+    <AssociationSet Name="FK_VoucherEntry_Project" Association="JacaProjCostModel.FK_VoucherEntry_Project">
+      <End Role="Project" EntitySet="Projects" />
+      <End Role="VoucherEntry" EntitySet="VoucherEntries" />
+    </AssociationSet>
+    <AssociationSet Name="FK_SalesInvoiceEntry_AccountEntry" Association="JacaProjCostModel.FK_SalesInvoiceEntry_AccountEntry">
+      <End Role="AccountEntry" EntitySet="AccountEntries" />
+      <End Role="SalesInvoiceEntry" EntitySet="SalesInvoiceEntries" />
+    </AssociationSet>
+    <EntitySet Name="Reports" EntityType="JacaProjCostModel.Report" />
+    <EntitySet Name="ReportPermissions" EntityType="JacaProjCostModel.ReportPermission" />
+    <AssociationSet Name="FK_ReportPermission_Report" Association="JacaProjCostModel.FK_ReportPermission_Report">
+      <End Role="Report" EntitySet="Reports" />
+      <End Role="ReportPermission" EntitySet="ReportPermissions" />
+    </AssociationSet>
+    <EntitySet Name="AccountEntryTypes" EntityType="JacaProjCostModel.AccountEntryType" />
+    <AssociationSet Name="FK_AccountEntry_AccountEntryType" Association="JacaProjCostModel.FK_AccountEntry_AccountEntryType">
+      <End Role="AccountEntryType" EntitySet="AccountEntryTypes" />
+      <End Role="AccountEntry" EntitySet="AccountEntries" />
+    </AssociationSet>
+    <AssociationSet Name="FK_AccountEntryType_AccountEntryType" Association="JacaProjCostModel.FK_AccountEntryType_AccountEntryType">
+      <End Role="AccountEntryType" EntitySet="AccountEntryTypes" />
+      <End Role="AccountEntryType1" EntitySet="AccountEntryTypes" />
+    </AssociationSet>
+  </EntityContainer>
+  <EntityType Name="AccountEntry">
+    <Key>
+      <PropertyRef Name="ID" />
+    </Key>
+    <Property Type="Int32" Name="ID" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Type="String" Name="Code" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="Title" Nullable="false" MaxLength="250" FixedLength="false" Unicode="true" />
+    <Property Type="Int32" Name="Type" Nullable="false" />
+    <Property Type="Boolean" Name="IsActive" Nullable="false" />
+    <NavigationProperty Name="VoucherEntries" Relationship="JacaProjCostModel.FK_VoucherEntry_AccountEntry" FromRole="AccountEntry" ToRole="VoucherEntry" />
+    <NavigationProperty Name="SalesInvoiceEntries" Relationship="JacaProjCostModel.FK_SalesInvoiceEntry_AccountEntry" FromRole="AccountEntry" ToRole="SalesInvoiceEntry" />
+    <Property Type="Int32" Name="AccountEntryTypeID" />
+    <NavigationProperty Name="AccountEntryType" Relationship="JacaProjCostModel.FK_AccountEntry_AccountEntryType" FromRole="AccountEntry" ToRole="AccountEntryType" />
+  </EntityType>
+  <EntityType Name="Bank">
+    <Key>
+      <PropertyRef Name="ID" />
+    </Key>
+    <Property Type="Int32" Name="ID" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Type="String" Name="Code" MaxLength="50" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="Name" MaxLength="100" FixedLength="false" Unicode="true" />
+    <Property Type="Boolean" Name="IsActive" Nullable="false" />
+    <NavigationProperty Name="VoucherEntries" Relationship="JacaProjCostModel.FK_VoucherEntry_Bank" FromRole="Bank" ToRole="VoucherEntry" />
+  </EntityType>
+  <EntityType Name="Project">
+    <Key>
+      <PropertyRef Name="ID" />
+    </Key>
+    <Property Type="Int32" Name="ID" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Type="String" Name="Code" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="Name" Nullable="false" MaxLength="250" FixedLength="false" Unicode="true" />
+    <Property Type="Decimal" Name="ContractAmount" Nullable="false" Precision="18" Scale="2" />
+    <Property Type="DateTime" Name="StartDate" Nullable="false" Precision="3" />
+    <Property Type="DateTime" Name="EndDate" Nullable="false" Precision="3" />
+    <Property Type="Boolean" Name="IsActive" Nullable="false" />
+    <Property Type="DateTime" Name="DateCreated" Nullable="false" Precision="3" />
+    <NavigationProperty Name="Vouchers" Relationship="JacaProjCostModel.FK_Voucher_Project" FromRole="Project" ToRole="Voucher" />
+    <NavigationProperty Name="SalesInvoices" Relationship="JacaProjCostModel.FK_SalesInvoice_Project" FromRole="Project" ToRole="SalesInvoice" />
+    <NavigationProperty Name="SalesInvoiceEntries" Relationship="JacaProjCostModel.FK_SalesInvoiceEntry_Project" FromRole="Project" ToRole="SalesInvoiceEntry" />
+    <NavigationProperty Name="VoucherEntries" Relationship="JacaProjCostModel.FK_VoucherEntry_Project" FromRole="Project" ToRole="VoucherEntry" />
+  </EntityType>
+  <EntityType Name="User">
+    <Key>
+      <PropertyRef Name="ID" />
+    </Key>
+    <Property Type="Int32" Name="ID" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Type="String" Name="Username" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="Password" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="Firstname" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="MiddleName" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="Lastname" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="Email" MaxLength="100" FixedLength="false" Unicode="true" />
+    <Property Type="Int32" Name="Role" Nullable="false" />
+    <Property Type="DateTime" Name="DateAdded" Nullable="false" Precision="3" />
+    <Property Type="DateTime" Name="DateLastLogin" Precision="3" />
+    <Property Type="Boolean" Name="IsActive" Nullable="false" />
+    <NavigationProperty Name="SystemLogs" Relationship="JacaProjCostModel.FK_SystemLog_User" FromRole="User" ToRole="SystemLog" />
+    <NavigationProperty Name="Vouchers" Relationship="JacaProjCostModel.FK_Voucher_User" FromRole="User" ToRole="Voucher" />
+    <NavigationProperty Name="VoucherEntries" Relationship="JacaProjCostModel.FK_VoucherEntry_User" FromRole="User" ToRole="VoucherEntry" />
+    <NavigationProperty Name="SalesInvoices" Relationship="JacaProjCostModel.FK_SalesInvoice_User" FromRole="User" ToRole="SalesInvoice" />
+    <NavigationProperty Name="SalesInvoiceEntries" Relationship="JacaProjCostModel.FK_SalesInvoiceEntry_User" FromRole="User" ToRole="SalesInvoiceEntry" />
+  </EntityType>
+  <EntityType Name="RolePermission">
+    <Key>
+      <PropertyRef Name="ID" />
+    </Key>
+    <Property Type="Int32" Name="ID" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Type="Int32" Name="Role" Nullable="false" />
+    <Property Type="Int32" Name="ActionRouteID" Nullable="false" />
+    <NavigationProperty Name="ActionRoute" Relationship="JacaProjCostModel.FK_RolePermission_ActionRoute" FromRole="RolePermission" ToRole="ActionRoute" />
+  </EntityType>
+  <EntityType Name="SystemLog">
+    <Key>
+      <PropertyRef Name="ID" />
+    </Key>
+    <Property Type="Int32" Name="ID" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Type="Int32" Name="UserID" Nullable="false" />
+    <Property Type="String" Name="Description" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="Action" MaxLength="50" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="Table" MaxLength="50" FixedLength="false" Unicode="true" />
+    <Property Type="DateTime" Name="Date" Nullable="false" Precision="3" />
+    <NavigationProperty Name="User" Relationship="JacaProjCostModel.FK_SystemLog_User" FromRole="SystemLog" ToRole="User" />
+  </EntityType>
+  <Association Name="FK_SystemLog_User">
+    <End Type="JacaProjCostModel.User" Role="User" Multiplicity="1" />
+    <End Type="JacaProjCostModel.SystemLog" Role="SystemLog" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="User">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="SystemLog">
+        <PropertyRef Name="UserID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <EntityType Name="ActionRoute">
+    <Key>
+      <PropertyRef Name="ID" />
+    </Key>
+    <Property Type="Int32" Name="ID" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Type="String" Name="Controller" MaxLength="50" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="Action" MaxLength="50" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="Description" MaxLength="250" FixedLength="false" Unicode="true" />
+    <Property Type="Int32" Name="ParentID" />
+    <Property Type="Boolean" Name="IsActive" Nullable="false" />
+    <NavigationProperty Name="ActionRoute1" Relationship="JacaProjCostModel.FK_ActionRoute_ActionRoute" FromRole="ActionRoute" ToRole="ActionRoute1" />
+    <NavigationProperty Name="ActionRoute2" Relationship="JacaProjCostModel.FK_ActionRoute_ActionRoute" FromRole="ActionRoute1" ToRole="ActionRoute" />
+    <NavigationProperty Name="RolePermissions" Relationship="JacaProjCostModel.FK_RolePermission_ActionRoute" FromRole="ActionRoute" ToRole="RolePermission" />
+    <Property Type="String" Name="Icon" MaxLength="50" FixedLength="false" Unicode="true" />
+    <Property Type="Int32" Name="Order" />
+  </EntityType>
+  <Association Name="FK_ActionRoute_ActionRoute">
+    <End Type="JacaProjCostModel.ActionRoute" Role="ActionRoute" Multiplicity="0..1" />
+    <End Type="JacaProjCostModel.ActionRoute" Role="ActionRoute1" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="ActionRoute">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="ActionRoute1">
+        <PropertyRef Name="ParentID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_RolePermission_ActionRoute">
+    <End Type="JacaProjCostModel.ActionRoute" Role="ActionRoute" Multiplicity="1" />
+    <End Type="JacaProjCostModel.RolePermission" Role="RolePermission" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="ActionRoute">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="RolePermission">
+        <PropertyRef Name="ActionRouteID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <EntityType Name="Payee">
+    <Key>
+      <PropertyRef Name="ID" />
+    </Key>
+    <Property Type="Int32" Name="ID" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Type="String" Name="Name" Nullable="false" MaxLength="250" FixedLength="false" Unicode="true" />
+    <Property Type="DateTime" Name="DateAdded" Precision="3" />
+    <Property Type="Boolean" Name="IsActive" />
+    <Property Type="String" Name="Address" MaxLength="250" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="TIN" MaxLength="100" FixedLength="false" Unicode="true" />
+    <NavigationProperty Name="Vouchers" Relationship="JacaProjCostModel.FK_Voucher_Payee" FromRole="Payee" ToRole="Voucher" />
+  </EntityType>
+  <EntityType Name="Voucher">
+    <Key>
+      <PropertyRef Name="ID" />
+    </Key>
+    <Property Type="Int32" Name="ID" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Type="Int32" Name="PayeeID" Nullable="false" />
+    <Property Type="Int32" Name="ProjectID" Nullable="false" />
+    <Property Type="String" Name="Remarks" MaxLength="250" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="CheckNo" MaxLength="150" FixedLength="false" Unicode="true" />
+    <Property Type="Decimal" Name="CheckAmount" Precision="18" Scale="2" />
+    <Property Type="Int32" Name="AddedByID" Nullable="false" />
+    <Property Type="DateTime" Name="DateAdded" Nullable="false" Precision="3" />
+    <NavigationProperty Name="Payee" Relationship="JacaProjCostModel.FK_Voucher_Payee" FromRole="Voucher" ToRole="Payee" />
+    <NavigationProperty Name="Project" Relationship="JacaProjCostModel.FK_Voucher_Project" FromRole="Voucher" ToRole="Project" />
+    <NavigationProperty Name="User" Relationship="JacaProjCostModel.FK_Voucher_User" FromRole="Voucher" ToRole="User" />
+    <NavigationProperty Name="VoucherEntries" Relationship="JacaProjCostModel.FK_VoucherEntry_Voucher" FromRole="Voucher" ToRole="VoucherEntry" />
+    <Property Type="Boolean" Name="Submitted" Nullable="false" />
+    <Property Type="DateTime" Name="DateSubmitted" Precision="3" />
+    <Property Type="DateTime" Name="CheckDate" Precision="3" />
+  </EntityType>
+  <EntityType Name="VoucherEntry">
+    <Key>
+      <PropertyRef Name="ID" />
+    </Key>
+    <Property Type="Int32" Name="ID" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Type="Int32" Name="VoucherID" Nullable="false" />
+    <Property Type="Int32" Name="AccountEntryID" Nullable="false" />
+    <Property Type="Int32" Name="BankID" />
+    <Property Type="Decimal" Name="Debit" Nullable="false" Precision="18" Scale="2" />
+    <Property Type="Decimal" Name="Credit" Nullable="false" Precision="18" Scale="2" />
+    <Property Type="Int32" Name="AddedByID" Nullable="false" />
+    <Property Type="DateTime" Name="DateAdded" Nullable="false" Precision="3" />
+    <NavigationProperty Name="AccountEntry" Relationship="JacaProjCostModel.FK_VoucherEntry_AccountEntry" FromRole="VoucherEntry" ToRole="AccountEntry" />
+    <NavigationProperty Name="User" Relationship="JacaProjCostModel.FK_VoucherEntry_User" FromRole="VoucherEntry" ToRole="User" />
+    <NavigationProperty Name="Voucher" Relationship="JacaProjCostModel.FK_VoucherEntry_Voucher" FromRole="VoucherEntry" ToRole="Voucher" />
+    <NavigationProperty Name="Bank" Relationship="JacaProjCostModel.FK_VoucherEntry_Bank" FromRole="VoucherEntry" ToRole="Bank" />
+    <Property Type="Int32" Name="ProjectID" />
+    <NavigationProperty Name="Project" Relationship="JacaProjCostModel.FK_VoucherEntry_Project" FromRole="VoucherEntry" ToRole="Project" />
+  </EntityType>
+  <Association Name="FK_VoucherEntry_AccountEntry">
+    <End Type="JacaProjCostModel.AccountEntry" Role="AccountEntry" Multiplicity="1" />
+    <End Type="JacaProjCostModel.VoucherEntry" Role="VoucherEntry" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="AccountEntry">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="VoucherEntry">
+        <PropertyRef Name="AccountEntryID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_Voucher_Payee">
+    <End Type="JacaProjCostModel.Payee" Role="Payee" Multiplicity="1" />
+    <End Type="JacaProjCostModel.Voucher" Role="Voucher" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Payee">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="Voucher">
+        <PropertyRef Name="PayeeID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_Voucher_Project">
+    <End Type="JacaProjCostModel.Project" Role="Project" Multiplicity="1" />
+    <End Type="JacaProjCostModel.Voucher" Role="Voucher" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Project">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="Voucher">
+        <PropertyRef Name="ProjectID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_Voucher_User">
+    <End Type="JacaProjCostModel.User" Role="User" Multiplicity="1" />
+    <End Type="JacaProjCostModel.Voucher" Role="Voucher" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="User">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="Voucher">
+        <PropertyRef Name="AddedByID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_VoucherEntry_User">
+    <End Type="JacaProjCostModel.User" Role="User" Multiplicity="1" />
+    <End Type="JacaProjCostModel.VoucherEntry" Role="VoucherEntry" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="User">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="VoucherEntry">
+        <PropertyRef Name="AddedByID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_VoucherEntry_Voucher">
+    <End Type="JacaProjCostModel.Voucher" Role="Voucher" Multiplicity="1" />
+    <End Type="JacaProjCostModel.VoucherEntry" Role="VoucherEntry" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Voucher">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="VoucherEntry">
+        <PropertyRef Name="VoucherID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_VoucherEntry_Bank">
+    <End Type="JacaProjCostModel.Bank" Role="Bank" Multiplicity="0..1" />
+    <End Type="JacaProjCostModel.VoucherEntry" Role="VoucherEntry" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Bank">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="VoucherEntry">
+        <PropertyRef Name="BankID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <EntityType Name="SalesInvoice">
+    <Key>
+      <PropertyRef Name="ID" />
+    </Key>
+    <Property Type="Int32" Name="ID" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Type="Int32" Name="AddedByID" Nullable="false" />
+    <Property Type="Int32" Name="ProjectID" />
+    <Property Type="DateTime" Name="DateAdded" Nullable="false" Precision="3" />
+    <Property Type="String" Name="Customer" MaxLength="250" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="TIN" MaxLength="50" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="Address" MaxLength="250" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="Business" MaxLength="250" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="Terms" MaxLength="250" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="PWDNo" MaxLength="100" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="PWDSignature" MaxLength="100" FixedLength="false" Unicode="true" />
+    <Property Type="Int32" Name="PercentCompletion" Nullable="false" />
+    <Property Type="Decimal" Name="PWDDiscount" Nullable="false" Precision="18" Scale="2" />
+    <Property Type="Decimal" Name="VatExemptSales" Nullable="false" Precision="18" Scale="2" />
+    <Property Type="Decimal" Name="ZeroRatedSales" Nullable="false" Precision="18" Scale="2" />
+    <Property Type="Boolean" Name="IsSubmitted" Nullable="false" />
+    <Property Type="DateTime" Name="DateSubmitted" Precision="3" />
+    <Property Type="Boolean" Name="IsCollected" Nullable="false" />
+    <Property Type="DateTime" Name="DateCollected" Precision="0" />
+    <NavigationProperty Name="Project" Relationship="JacaProjCostModel.FK_SalesInvoice_Project" FromRole="SalesInvoice" ToRole="Project" />
+    <NavigationProperty Name="User" Relationship="JacaProjCostModel.FK_SalesInvoice_User" FromRole="SalesInvoice" ToRole="User" />
+    <NavigationProperty Name="SalesInvoiceEntries" Relationship="JacaProjCostModel.FK_SalesInvoiceEntry_SalesInvoice" FromRole="SalesInvoice" ToRole="SalesInvoiceEntry" />
+    <Property Type="String" Name="InvoiceNo" MaxLength="50" FixedLength="false" Unicode="true" />
+    <Property Type="Boolean" Name="Vatable" />
+    <Property Type="String" Name="ORNo" MaxLength="100" FixedLength="false" Unicode="true" />
+  </EntityType>
+  <EntityType Name="SalesInvoiceEntry">
+    <Key>
+      <PropertyRef Name="ID" />
+    </Key>
+    <Property Type="Int32" Name="ID" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Type="Int32" Name="SalesInvoiceID" Nullable="false" />
+    <Property Type="Int32" Name="Quantity" Nullable="false" />
+    <Property Type="String" Name="Unit" MaxLength="50" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="Articles" Nullable="false" MaxLength="250" FixedLength="false" Unicode="true" />
+    <Property Type="Decimal" Name="UnitPrice" Nullable="false" Precision="18" Scale="2" />
+    <Property Type="Int32" Name="AddedbyID" Nullable="false" />
+    <Property Type="DateTime" Name="DateAdded" Nullable="false" Precision="3" />
+    <NavigationProperty Name="SalesInvoice" Relationship="JacaProjCostModel.FK_SalesInvoiceEntry_SalesInvoice" FromRole="SalesInvoiceEntry" ToRole="SalesInvoice" />
+    <NavigationProperty Name="User" Relationship="JacaProjCostModel.FK_SalesInvoiceEntry_User" FromRole="SalesInvoiceEntry" ToRole="User" />
+    <Property Type="Int32" Name="ProjectID" />
+    <NavigationProperty Name="Project" Relationship="JacaProjCostModel.FK_SalesInvoiceEntry_Project" FromRole="SalesInvoiceEntry" ToRole="Project" />
+    <Property Type="Int32" Name="AccountEntryID" />
+    <NavigationProperty Name="AccountEntry" Relationship="JacaProjCostModel.FK_SalesInvoiceEntry_AccountEntry" FromRole="SalesInvoiceEntry" ToRole="AccountEntry" />
+  </EntityType>
+  <Association Name="FK_SalesInvoice_Project">
+    <End Type="JacaProjCostModel.Project" Role="Project" Multiplicity="0..1" />
+    <End Type="JacaProjCostModel.SalesInvoice" Role="SalesInvoice" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Project">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="SalesInvoice">
+        <PropertyRef Name="ProjectID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_SalesInvoice_User">
+    <End Type="JacaProjCostModel.User" Role="User" Multiplicity="1" />
+    <End Type="JacaProjCostModel.SalesInvoice" Role="SalesInvoice" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="User">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="SalesInvoice">
+        <PropertyRef Name="AddedByID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_SalesInvoiceEntry_SalesInvoice">
+    <End Type="JacaProjCostModel.SalesInvoice" Role="SalesInvoice" Multiplicity="1" />
+    <End Type="JacaProjCostModel.SalesInvoiceEntry" Role="SalesInvoiceEntry" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="SalesInvoice">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="SalesInvoiceEntry">
+        <PropertyRef Name="SalesInvoiceID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_SalesInvoiceEntry_User">
+    <End Type="JacaProjCostModel.User" Role="User" Multiplicity="1" />
+    <End Type="JacaProjCostModel.SalesInvoiceEntry" Role="SalesInvoiceEntry" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="User">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="SalesInvoiceEntry">
+        <PropertyRef Name="AddedbyID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_SalesInvoiceEntry_Project">
+    <End Type="JacaProjCostModel.Project" Role="Project" Multiplicity="0..1" />
+    <End Type="JacaProjCostModel.SalesInvoiceEntry" Role="SalesInvoiceEntry" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Project">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="SalesInvoiceEntry">
+        <PropertyRef Name="ProjectID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_VoucherEntry_Project">
+    <End Type="JacaProjCostModel.Project" Role="Project" Multiplicity="0..1" />
+    <End Type="JacaProjCostModel.VoucherEntry" Role="VoucherEntry" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Project">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="VoucherEntry">
+        <PropertyRef Name="ProjectID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_SalesInvoiceEntry_AccountEntry">
+    <End Type="JacaProjCostModel.AccountEntry" Role="AccountEntry" Multiplicity="0..1" />
+    <End Type="JacaProjCostModel.SalesInvoiceEntry" Role="SalesInvoiceEntry" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="AccountEntry">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="SalesInvoiceEntry">
+        <PropertyRef Name="AccountEntryID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <EntityType Name="Report">
+    <Key>
+      <PropertyRef Name="ID" />
+    </Key>
+    <Property Type="Int32" Name="ID" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Type="String" Name="Title" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="Description" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="ButtonCommand" MaxLength="100" FixedLength="false" Unicode="true" />
+    <NavigationProperty Name="ReportPermissions" Relationship="JacaProjCostModel.FK_ReportPermission_Report" FromRole="Report" ToRole="ReportPermission" />
+  </EntityType>
+  <EntityType Name="ReportPermission">
+    <Key>
+      <PropertyRef Name="ID" />
+    </Key>
+    <Property Type="Int32" Name="ID" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Type="Int32" Name="RoleID" Nullable="false" />
+    <Property Type="Int32" Name="ReportID" Nullable="false" />
+    <Property Type="Boolean" Name="Allowed" Nullable="false" />
+    <NavigationProperty Name="Report" Relationship="JacaProjCostModel.FK_ReportPermission_Report" FromRole="ReportPermission" ToRole="Report" />
+  </EntityType>
+  <Association Name="FK_ReportPermission_Report">
+    <End Type="JacaProjCostModel.Report" Role="Report" Multiplicity="1" />
+    <End Type="JacaProjCostModel.ReportPermission" Role="ReportPermission" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Report">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="ReportPermission">
+        <PropertyRef Name="ReportID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <EntityType Name="AccountEntryType">
+    <Key>
+      <PropertyRef Name="ID" />
+    </Key>
+    <Property Type="Int32" Name="ID" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Type="String" Name="Code" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="Type" Nullable="false" MaxLength="250" FixedLength="false" Unicode="true" />
+    <Property Type="Int32" Name="ParentID" />
+    <NavigationProperty Name="AccountEntries" Relationship="JacaProjCostModel.FK_AccountEntry_AccountEntryType" FromRole="AccountEntryType" ToRole="AccountEntry" />
+    <NavigationProperty Name="AccountEntryType1" Relationship="JacaProjCostModel.FK_AccountEntryType_AccountEntryType" FromRole="AccountEntryType" ToRole="AccountEntryType1" />
+    <NavigationProperty Name="AccountEntryType2" Relationship="JacaProjCostModel.FK_AccountEntryType_AccountEntryType" FromRole="AccountEntryType1" ToRole="AccountEntryType" />
+  </EntityType>
+  <Association Name="FK_AccountEntry_AccountEntryType">
+    <End Type="JacaProjCostModel.AccountEntryType" Role="AccountEntryType" Multiplicity="0..1" />
+    <End Type="JacaProjCostModel.AccountEntry" Role="AccountEntry" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="AccountEntryType">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="AccountEntry">
+        <PropertyRef Name="AccountEntryTypeID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_AccountEntryType_AccountEntryType">
+    <End Type="JacaProjCostModel.AccountEntryType" Role="AccountEntryType" Multiplicity="0..1" />
+    <End Type="JacaProjCostModel.AccountEntryType" Role="AccountEntryType1" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="AccountEntryType">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="AccountEntryType1">
+        <PropertyRef Name="ParentID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+</Schema>
