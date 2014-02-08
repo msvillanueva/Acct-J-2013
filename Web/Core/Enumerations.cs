@@ -72,7 +72,8 @@ namespace Web.Core
             VoucherEntry,
             SalesInvoice,
             SalesInvoiceEntry,
-            Report
+            Report,
+            RolePermission
         }
 
         public enum Searchrangetype

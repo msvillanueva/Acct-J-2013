@@ -111,5 +111,33 @@ namespace Web.Controllers
             return Json(new[] { id }.ToDataSourceResult(request, ModelState));
         }
 
+        [AcceptVerbs(HttpVerbs.Post)]
+        public ActionResult ToggleEncoderAccountEntriesMng([DataSourceRequest] DataSourceRequest request, bool allowed)
+        {
+            try
+            {
+                LSystemLog.Insert(UserSession.UserId, Core.Enumerations.ActionType.ChangePermission, Core.Enumerations.ActionTable.RolePermission, (allowed ? "Allow" : "Restrict") + " encoder to manage account entries");
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("data_error", ex.Message);
+            }
+            return Json(new[] { "" }.ToDataSourceResult(request, ModelState));
+        }
+
+        [AcceptVerbs(HttpVerbs.Post)]
+        public ActionResult ToggleEncoderPayeesMng([DataSourceRequest] DataSourceRequest request, bool allowed)
+        {
+            try
+            {
+                LSystemLog.Insert(UserSession.UserId, Core.Enumerations.ActionType.ChangePermission, Core.Enumerations.ActionTable.RolePermission, (allowed ? "Allow" : "Restrict") + " encoder to manage payees");
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("data_error", ex.Message);
+            }
+            return Json(new[] { "" }.ToDataSourceResult(request, ModelState));
+        }
+
     }
 }
