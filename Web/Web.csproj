@@ -200,6 +200,7 @@
     <Compile Include="Core\DataAccess\LPayee.cs" />
     <Compile Include="Core\DataAccess\LProject.cs" />
     <Compile Include="Core\DataAccess\LReportPermission.cs" />
+    <Compile Include="Core\DataAccess\LRolePermission.cs" />
     <Compile Include="Core\DataAccess\LSalesInvoice.cs" />
     <Compile Include="Core\DataAccess\LSalesInvoiceEntry.cs" />
     <Compile Include="Core\DataAccess\LSystemLog.cs" />

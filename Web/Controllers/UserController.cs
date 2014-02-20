@@ -20,6 +20,8 @@ namespace Web.Controllers
         {
             ViewBag.Title = "Manage Users";
             ViewBag.SubTitle = "Add, edit, delete and assign roles to users.";
+            ViewBag.AllowEncAcctEntries = LRolePermission.GetRolePermission(Enumerations.Role.Encoder, LActionRoute.GetActionRoute("Index", "AccountEntry")) != null;
+            ViewBag.AllowEncPayees = LRolePermission.GetRolePermission(Enumerations.Role.Encoder, LActionRoute.GetActionRoute("Index", "Payee")) != null;
             return View();
         }
 
@@ -116,6 +118,14 @@ namespace Web.Controllers
         {
             try
             {
+                if (allowed)
+                {
+                    LRolePermission.Create(Enumerations.Role.Encoder, LActionRoute.GetActionRoute("Index", "AccountEntry"));
+                }
+                else
+                {
+                    LRolePermission.Delete(Enumerations.Role.Encoder, LActionRoute.GetActionRoute("Index", "AccountEntry"));
+                }
                 LSystemLog.Insert(UserSession.UserId, Core.Enumerations.ActionType.ChangePermission, Core.Enumerations.ActionTable.RolePermission, (allowed ? "Allow" : "Restrict") + " encoder to manage account entries");
             }
             catch (Exception ex)
@@ -130,6 +140,14 @@ namespace Web.Controllers
         {
             try
             {
+                if (allowed)
+                {
+                    LRolePermission.Create(Enumerations.Role.Encoder, LActionRoute.GetActionRoute("Index", "Payee"));
+                }
+                else
+                {
+                    LRolePermission.Delete(Enumerations.Role.Encoder, LActionRoute.GetActionRoute("Index", "Payee"));
+                }
                 LSystemLog.Insert(UserSession.UserId, Core.Enumerations.ActionType.ChangePermission, Core.Enumerations.ActionTable.RolePermission, (allowed ? "Allow" : "Restrict") + " encoder to manage payees");
             }
             catch (Exception ex)

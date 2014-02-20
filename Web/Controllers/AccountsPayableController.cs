@@ -98,7 +98,7 @@ namespace Web.Controllers
                         if (ewtEntry != null)
                         {
                             var ewtPercent = ewt / 100;
-                            var ewtAmount = (voucher.CheckAmount / (Constants.VATPercent() + 1)) * ewtPercent;
+                            var ewtAmount = (voucher.CheckAmount / (inputtax == "true" ? (Constants.VATPercent() + 1) : 1)) * ewtPercent;
                             var ewtVEntry = new CVoucherEntry()
                             {
                                 VoucherID = voucher.ID,

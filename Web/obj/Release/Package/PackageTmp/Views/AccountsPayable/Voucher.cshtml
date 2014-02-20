@@ -38,15 +38,15 @@
                 <td>Date Created:</td>
                 <td>@(((DateTime)Model.DateAdded).ToShortDateString())</td>
             </tr>
-            <tr>
+            <tr class="k-alt">
                 <td>Check Date:</td>
                 <td>@(((DateTime)Model.CheckDate).ToShortDateString())</td>
             </tr>
-            <tr class="k-alt">
+            <tr>
                 <td>Check Amount:</td>
                 <td>@String.Format("{0:n}", Model.CheckAmount)</td>
             </tr>
-            <tr>
+            <tr class="k-alt">
                 <td>Status:</td>
                 <td>@Model.Status</td>
             </tr>

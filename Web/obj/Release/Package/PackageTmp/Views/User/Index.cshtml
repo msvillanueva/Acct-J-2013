@@ -5,6 +5,21 @@
 @using Web.Models
 @model List<CUser>
 
+<h6>User Options</h6>
+<div>
+    <table>
+        <tr class="report-table">
+            <td><input type="checkbox" id="encAcctEntries" @(ViewBag.AllowEncAcctEntries ? "checked" : "") /></td>
+            <td>Allow Encoders to manage account entries.</td>
+        </tr>
+        <tr class="report-table">
+            <td><input type="checkbox" id="encPayees" @(ViewBag.AllowEncPayees ? "checked" : "") /></td>
+            <td>Allow Encoders to manage Payees.</td>
+        </tr>
+    </table>
+</div>
+<br />
+<h6>List of Users</h6>
 @(Html.Kendo().Grid<CUser>()
     .Name("Grid")
     .Columns(columns =>
@@ -108,6 +123,51 @@
                 .center()
                 .open();
         });
+
+        $('#encAcctEntries').click(function () {
+            var checked = $(this).is(':checked');
+            $.ajax({
+                type: 'POST',
+                url: '@Url.Action("ToggleEncoderAccountEntriesMng", "User")',
+                contentType: 'application/json; charset=utf-8',
+                data: '{ "allowed":"' + checked + '"}',
+                dataType: 'json',
+                success: function (result) {
+                    loader.hideLoading();
+                    jsonText = JSON.stringify(result);
+                    data = JSON.parse(jsonText);
+                    if (data.Errors == null) {
+                        RefreshGrid();
+                    }
+                    else {
+                        jAlertBox(data.Errors.data_error.errors[0], "Error");
+                    }
+                }
+            });
+        });
+
+        $('#encPayees').click(function () {
+            var checked = $(this).is(':checked');
+            $.ajax({
+                type: 'POST',
+                url: '@Url.Action("ToggleEncoderPayeesMng", "User")',
+                contentType: 'application/json; charset=utf-8',
+                data: '{ "allowed":"' + checked + '"}',
+                dataType: 'json',
+                success: function (result) {
+                    loader.hideLoading();
+                    jsonText = JSON.stringify(result);
+                    data = JSON.parse(jsonText);
+                    if (data.Errors == null) {
+                        RefreshGrid();
+                    }
+                    else {
+                        jAlertBox(data.Errors.data_error.errors[0], "Error");
+                    }
+                }
+            });
+        });
+
     });
 
 

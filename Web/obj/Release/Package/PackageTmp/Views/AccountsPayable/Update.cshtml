@@ -62,7 +62,7 @@
                         <td>@Html.TextBox("checkno", Model.CheckNo, new { @maxlength = 100 })</td>
                     </tr>
                     <tr>
-                        <td class="form-label">Check Amount:</td>
+                        <td class="form-label"><span id="lblAmount">Check Amount</span>:</td>
                         <td>
                             @(Html.Kendo().NumericTextBox<float>()
                                 .Name("checkamount")
@@ -125,6 +125,15 @@
         $('#projectcode').on('input', function () {
             clearTimeout(timeoutId);
             timeoutId = setTimeout(SetProjectDropdown, 500);
+        });
+
+        $('#inputtax').change(function () {
+            if ($(this).is(':checked')) {
+                $('#lblAmount').html('Gross Amount');
+                //jAlertBox('Check amount will be automatically computed after applying input tax to gross amount.');
+            }
+            else
+                $('#lblAmount').html('Check Amount');
         });
 
         $('#btnSave').click(function () {

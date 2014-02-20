@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using Web.Core.Entities;
 using Web.Models;
 
 namespace Web.Core.DataAccess
@@ -70,6 +71,26 @@ namespace Web.Core.DataAccess
                     .Where(a => a.Role == (int)role && a.ActionRoute.IsActive)
                     .Select(a => a.ActionRoute.Controller.Trim().ToUpper())
                     .ToList();
+            }
+        }
+
+        public static CActionRoute GetActionRoute(string action, string controller)
+        {
+            using (var db = Connection.GetEntityContext())
+            {
+                return db.ActionRoutes
+                    .Where(a => a.Action.ToLower() == action.ToLower() && a.Controller.ToLower() == controller.ToLower())
+                    .Select(a => new CActionRoute()
+                    {
+                        ID = a.ID,
+                        Controller = a.Controller,
+                        Action = a.Action,
+                        Description = a.Description,
+                        Icon = a.Icon,
+                        ParentId = a.ParentID,
+                        Order = a.Order
+                    })
+                    .FirstOrDefault();
             }
         }
 

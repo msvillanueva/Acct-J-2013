@@ -9,12 +9,12 @@
 <div>
     <table>
         <tr class="report-table">
-            <td><input type="checkbox" id="encAcctEntries" /></td>
-            <td><strong>Allow Encoders to manage account entries.</strong></td>
+            <td><input type="checkbox" id="encAcctEntries" @(ViewBag.AllowEncAcctEntries ? "checked" : "") /></td>
+            <td>Allow Encoders to manage account entries.</td>
         </tr>
         <tr class="report-table">
-            <td><input type="checkbox" id="encPayees" /></td>
-            <td><strong>Allow Encoders to manage Payees.</strong></td>
+            <td><input type="checkbox" id="encPayees" @(ViewBag.AllowEncPayees ? "checked" : "") /></td>
+            <td>Allow Encoders to manage Payees.</td>
         </tr>
     </table>
 </div>
