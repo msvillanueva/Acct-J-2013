@@ -136,7 +136,7 @@ namespace Web.Controllers
             FileInfo file = new FileInfo(path);
             var stream = new System.IO.MemoryStream();
 
-            Workbook workbook = WorkbookGenerator.GenerateTrialBalanceReport(dateFrom, dateTo);
+            Workbook workbook = WorkbookGenerator.GenerateTrialBalanceReport(dateTo);
             workbook.Save(stream, FileFormatType.Excel2007Xlsx);
 
             Response.ClearContent();

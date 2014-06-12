@@ -224,15 +224,25 @@ namespace Web.Core
             return workbook;
         }
 
-        public static Workbook GenerateTrialBalanceReport(string dateFrom, string dateTo)
+        public static Workbook GenerateTrialBalanceReport(string dateTo)
         {
-            var _dateFrom = Convert.ToDateTime(dateFrom);
-            var _dateTo = Convert.ToDateTime(dateTo).AddHours(23).AddMinutes(59);
+            var yearNow = Convert.ToDateTime(dateTo).Year;
+            var chartOfAccounts = LAccountEntryType.GetTypes();
+            var accountEntries = LAccountEntry.GetEntries();
+            var tbCodes = new List<string>() { 
+                "1000","1200","1300","1400","2000","2100","3000","4000","5000","6000"
+            };
 
-            var entries = LVoucherEntry.GetEntries(_dateFrom, _dateTo);
-            //var projects = entries.Select(a => a.ProjectName).Distinct().ToList();
-            decimal totalDebit = 0;
-            decimal totalCredit = 0;
+            var tbEntryTypes = chartOfAccounts.Where(a => tbCodes.Contains(a.Code)).ToList();
+            var entries = LVoucherEntry.GetEntries();
+
+            var currentEntries = entries.Where(a => a.DateAdded.Year == yearNow).ToList();
+            var pastEnries = entries.Where(a => a.DateAdded.Year < yearNow).ToList();
+
+            decimal totalPastDebit = 0;
+            decimal totalPastCredit = 0;
+            decimal totalCurrentDebit = 0;
+            decimal totalCurrentCredit = 0;
 
             Workbook workbook = new Workbook();
             Worksheet sheet = workbook.Worksheets[0];
@@ -240,26 +250,90 @@ namespace Web.Core
             int col = 0;
             int row = 0;
 
+            Cell cellToStyle;
+            Style styleCenterText;
+
+
             row = 4;
-            cells[row, 0].PutValue("Project Name");
-            cells[row, 1].PutValue("Account Entry");
-            cells[row, 2].PutValue("Debit");
-            cells[row++, 3].PutValue("Credit");
-            col = 1;
-            foreach (var p in entries.OrderBy(a => a.ProjectName).ThenBy(a => a.AccountEntryName))
+            cells.Merge(row, 6, 1, 2);
+            cells.Merge(row, 4, 1, 2);
+            cells.Merge(row, 2, 1, 2);
+            cells[row, 2].PutValue("Beginning Balance");
+            cellToStyle = cells[row, 2];
+            styleCenterText = cellToStyle.GetStyle();
+            styleCenterText.HorizontalAlignment = TextAlignmentType.Center;
+            cellToStyle.SetStyle(styleCenterText);
+            cells[row, 4].PutValue("Current Year");
+            cellToStyle = cells[row, 4];
+            styleCenterText = cellToStyle.GetStyle();
+            styleCenterText.HorizontalAlignment = TextAlignmentType.Center;
+            cellToStyle.SetStyle(styleCenterText);
+            cells[row, 6].PutValue("Trial Balance");
+            cellToStyle = cells[row, 6];
+            styleCenterText = cellToStyle.GetStyle();
+            styleCenterText.HorizontalAlignment = TextAlignmentType.Center;
+            cellToStyle.SetStyle(styleCenterText);
+            row = 5;
+            cells[row, 2].PutValue("DR");
+            cells[row, 3].PutValue("CR");
+            cells[row, 4].PutValue("DR");
+            cells[row, 5].PutValue("CR");
+            cells[row, 6].PutValue("DR");
+            cells[row, 7].PutValue("CR");
+            row++;
+
+            col = 0;
+            foreach (var entryType in tbEntryTypes)
             {
-                //decimal debits = entries.Where(a => a.ProjectName == p).Sum(a => a.Debit);
-                //decimal credits = entries.Where(a => a.ProjectName == p).Sum(a => a.Credit);
-                cells[row, 0].PutValue(p.ProjectName); 
-                cells[row, 1].PutValue(p.AccountEntryName);
-                cells[row, 2].PutValue(Utility.To2Dec(p.Debit));
-                cells[row++, 3].PutValue(Utility.To2Dec(p.Credit));
-                totalDebit = totalDebit + p.Debit;
-                totalCredit = totalCredit + p.Credit;
+                cells[row, 0].PutValue(entryType.Code);
+                cells[row, 1].PutValue(entryType.Type);
+                var pEntry = pastEnries.Where(a => a.AccountEntryTypeID == entryType.ID).ToList();
+                var cEntry = currentEntries.Where(a => a.AccountEntryTypeID == entryType.ID).ToList();
+
+                cells[row, 2].PutValue(pEntry.Sum(a => a.Debit));
+                cells[row, 3].PutValue(pEntry.Sum(a => a.Credit));
+                cells[row, 4].PutValue(cEntry.Sum(a => a.Debit));
+                cells[row, 5].PutValue(cEntry.Sum(a => a.Credit));
+                cells[row, 6].PutValue(pEntry.Sum(a => a.Debit) + cEntry.Sum(a => a.Debit));
+                cells[row, 7].PutValue(pEntry.Sum(a => a.Credit) + cEntry.Sum(a => a.Credit));
+
+                totalPastDebit += pEntry.Sum(a => a.Debit);
+                totalPastCredit += pEntry.Sum(a => a.Credit);
+                totalCurrentDebit += cEntry.Sum(a => a.Debit);
+                totalCurrentCredit += cEntry.Sum(a => a.Credit);
+                row++;
+
+                //child entries
+                foreach (var childEntryType in chartOfAccounts.Where(a => a.ParentID == entryType.ID).ToList())
+                {
+                    cells[row, 0].PutValue(childEntryType.Code);
+                    cells[row, 1].PutValue("   " + childEntryType.Type);
+                    var _pEntry = pastEnries.Where(a => a.AccountEntryTypeID == childEntryType.ID).ToList();
+                    var _cEntry = currentEntries.Where(a => a.AccountEntryTypeID == childEntryType.ID).ToList();
+
+                    cells[row, 2].PutValue(_pEntry.Sum(a => a.Debit));
+                    cells[row, 3].PutValue(_pEntry.Sum(a => a.Credit));
+                    cells[row, 4].PutValue(_cEntry.Sum(a => a.Debit));
+                    cells[row, 5].PutValue(_cEntry.Sum(a => a.Credit));
+                    cells[row, 6].PutValue(_pEntry.Sum(a => a.Debit) + _cEntry.Sum(a => a.Debit));
+                    cells[row, 7].PutValue(_pEntry.Sum(a => a.Credit) + _cEntry.Sum(a => a.Credit));
+
+                    totalPastDebit += _pEntry.Sum(a => a.Debit);
+                    totalPastCredit += _pEntry.Sum(a => a.Credit);
+                    totalCurrentDebit += _cEntry.Sum(a => a.Debit);
+                    totalCurrentCredit += _cEntry.Sum(a => a.Credit);
+                    row++;
+                }
             }
+            row++;
             cells[row, 0].PutValue("Total");
-            cells[row, 2].PutValue(Utility.To2Dec(totalDebit));
-            cells[row++, 3].PutValue(Utility.To2Dec(totalCredit));
+            cells[row, 2].PutValue(Utility.To2Dec(totalPastDebit));
+            cells[row, 3].PutValue(Utility.To2Dec(totalPastCredit));
+            cells[row, 4].PutValue(Utility.To2Dec(totalCurrentDebit));
+            cells[row, 5].PutValue(Utility.To2Dec(totalCurrentCredit));
+            cells[row, 6].PutValue(Utility.To2Dec(totalPastDebit + totalCurrentDebit));
+            cells[row, 7].PutValue(Utility.To2Dec(totalPastCredit + totalCurrentCredit));
+            row++;
             row++;
 
             cells[row, col].PutValue("");
@@ -270,11 +344,16 @@ namespace Web.Core
             col = 0;
             cells[row++, col].PutValue(Constants.CoName().ToUpper());
             cells[row++, col].PutValue("TRIAL BALANCE");
-            string dateRange = _dateFrom.Month == _dateTo.Month ?
-                "FOR THE MONTH OF " + _dateFrom.ToString("MMMM").ToUpper() + ", " + _dateFrom.Year.ToString() :
-                "FROM " + dateFrom + " TO " + dateTo;
+            string dateRange = "FOR THE YEAR OF " + yearNow.ToString();
             cells[row++, col].PutValue(dateRange);
             cells[row++, col].PutValue("");
+
+            sheet.Cells.SetColumnWidth(2, 13);
+            sheet.Cells.SetColumnWidth(3, 13);
+            sheet.Cells.SetColumnWidth(4, 13);
+            sheet.Cells.SetColumnWidth(5, 13);
+            sheet.Cells.SetColumnWidth(6, 13);
+            sheet.Cells.SetColumnWidth(7, 13);
 
             return workbook;
         }

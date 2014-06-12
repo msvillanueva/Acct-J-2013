@@ -157,6 +157,45 @@ namespace Web.Core.DataAccess
             }
         }
 
+        public static List<CVoucherEntry> GetEntries()
+        {
+            using (var db = Connection.GetEntityContext())
+            {
+                return db.VoucherEntries
+                    .Include("AccountEntry")
+                    .Include("Voucher")
+                    .Include("Bank")
+                    .Include("User")
+                    .Include("Project")
+                    .Include("Payee")
+                    .Select(a => new CVoucherEntry()
+                    {
+                        ID = a.ID,
+                        AccountEntryCode = a.AccountEntry.Code,
+                        AccountEntryID = a.AccountEntryID,
+                        AccountEntryName = a.AccountEntry.Title,
+                        AccountEntryTypeID = a.AccountEntry.AccountEntryTypeID,
+                        AddedByID = a.AddedByID,
+                        AddedByName = a.User.Firstname + " " + a.User.Lastname,
+                        BankID = a.BankID,
+                        BankName = a.Bank.Name,
+                        BankCode = a.Bank.Code,
+                        Debit = a.Debit,
+                        Credit = a.Credit,
+                        VoucherID = a.VoucherID,
+                        DateAdded = a.DateAdded,
+                        ProjectID = a.ProjectID,
+                        ProjectName = a.Project.Name,
+                        ProjectCode = a.Project.Code,
+                        CheckNo = a.Voucher.CheckNo,
+                        CheckDate = a.Voucher.CheckDate,
+                        PayeeName = a.Voucher.Payee.Name
+                    })
+                    .OrderBy(a => a.AccountEntryName)
+                    .ToList();
+            }
+        }
+
         public static CVoucherEntry GetEntry(int id)
         {
             using (var db = Connection.GetEntityContext())
