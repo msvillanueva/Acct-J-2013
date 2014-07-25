@@ -2571,7 +2571,7 @@ input:focus:invalid:focus, textarea:focus:invalid:focus, select:focus:invalid:fo
 }
 
 
-@media (max-width: 1024px) {
+/*@media (max-width: 1024px) {
 
   .row-fluid [class*="span"]:first-child > .semi-widget:first-child { margin-top: 10px; }
   .row-fluid [class*="span"] > .semi-widget:first-child { margin-top: 15px; }
@@ -2673,7 +2673,7 @@ input:focus:invalid:focus, textarea:focus:invalid:focus, select:focus:invalid:fo
   #sidebar { margin-left: -253px; z-index: 99; background: url(../img/backgrounds/main.png); }
   #sidebar.hide-sidebar { margin-left: 0; }
 
-}
+}*/
 
 
 @media (max-width: 480px) {

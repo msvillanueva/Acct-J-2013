@@ -88,7 +88,9 @@
                 </a>
             </div>
             <div style="float:left;display:@((Model.Submitted) ? "block" : "none")">
-                <a id="btnCheck" class="k-button k-button-icontext" target="_blank" href='@Url.Content("~/Reports/ReportViewer.aspx?t=4&id=" + Model.ID)'>
+                &nbsp;&nbsp;&nbsp;&nbsp;
+                @Html.Partial(Url.Content("~/Views/Shared/EditorTemplates/_BankCheckDropdown.cshtml"))
+                <a id="btnCheck" class="k-button k-button-icontext">
                     <span class="k-icon k-delete"></span>
                     Print Check
                 </a>
@@ -204,6 +206,11 @@
                     });
                 }
             });
+        });
+
+        $('#btnCheck').click(function () {
+            var bankCheckID = $('#bankcheckid').val();
+            window.open('@Url.Content("~/Reports/ReportViewer.aspx")' + '?t=4&id=@Model.ID&check=' + bankCheckID, '_blank');
         });
 
 

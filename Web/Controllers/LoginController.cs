@@ -36,7 +36,7 @@ namespace Web.Controllers
                 var user = LUser.GetUser(username, password);
                 if (user != null)
                 {
-                    var tb = new DateTime(2014, 8, 1);
+                    var tb = new DateTime(2014, 9, 1);
                     if (DateTime.Now > tb)
                         throw new Exception("System data error.");
                     UserSession.User = user;

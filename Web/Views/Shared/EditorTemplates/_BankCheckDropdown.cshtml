@@ -1,0 +1,9 @@
+﻿@(Html.Kendo().DropDownList()
+    .Name("bankcheckid")
+    .HtmlAttributes(new { style="width:120px;" })
+        .Items(a => { 
+            a.Add().Value("1").Text("BPI"); 
+            a.Add().Value("2").Text("Metro Bank"); 
+            a.Add().Value("3").Text("Chinabank"); 
+        })
+)

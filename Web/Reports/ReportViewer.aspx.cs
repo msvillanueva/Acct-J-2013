@@ -196,6 +196,7 @@ namespace Web.Reports
         private void PrintCheck()
         {
             var id = Convert.ToInt32(WebContext.GetQueryStringValue("id"));
+            var check = Convert.ToInt32(WebContext.GetQueryStringValue("check"));
 
             var voucher = LVoucher.GetVoucher(id);
             if (voucher != null)
@@ -204,15 +205,24 @@ namespace Web.Reports
                 var entries = LVoucherEntry.GetEntries(voucher.ID);
 
                 rpt.ProcessingMode = ProcessingMode.Local;
-                rpt.LocalReport.ReportPath = Server.MapPath("~/Core/Reports/Check.rdlc");
+                switch (check)
+                {
+                    case 1: rpt.LocalReport.ReportPath = Server.MapPath("~/Core/Reports/CheckBPI.rdlc"); break;
+                    case 2: rpt.LocalReport.ReportPath = Server.MapPath("~/Core/Reports/CheckMetroBank.rdlc"); break;
+                    case 3: rpt.LocalReport.ReportPath = Server.MapPath("~/Core/Reports/CheckChinabank.rdlc"); break;
+                    default: break;
+                }
+                
+
+
                 var sig = UserSession.User.Firstname + " " + UserSession.User.Middlename.Substring(0, 1) + ". " + UserSession.User.Lastname;
 
                 var par = new List<ReportParameter>();
-                par.Add(new ReportParameter("Payee", voucher.PayeeName));
-                par.Add(new ReportParameter("CheckDate",voucher.CheckDate != null ? ((DateTime)voucher.CheckDate).ToShortDateString() : ""));
+                par.Add(new ReportParameter("Payee", "** " + voucher.PayeeName + " **"));
+                par.Add(new ReportParameter("CheckDate","** " + (voucher.CheckDate != null ? ((DateTime)voucher.CheckDate).ToShortDateString() : "") + " **"));
                 var checkAmount = (decimal)(voucher.CheckAmount == null ? 0 : voucher.CheckAmount);
-                par.Add(new ReportParameter("Amount", checkAmount.ToString("#,###.00")));
-                par.Add(new ReportParameter("AmountText", Utility.NumberToCurrencyText(checkAmount)));
+                par.Add(new ReportParameter("Amount", "** " + checkAmount.ToString("#,###.00") + " **"));
+                par.Add(new ReportParameter("AmountText","** " + Utility.NumberToCurrencyText(checkAmount) + " **"));
 
                 rpt.LocalReport.SetParameters(par);
 
