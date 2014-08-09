@@ -1206,6 +1206,7 @@
     <Content Include="Views\Logs\Index.cshtml" />
     <Content Include="Views\ReportSettings\Index.cshtml" />
     <Content Include="Views\Shared\EditorTemplates\_BankCheckDropdown.cshtml" />
+    <Content Include="Views\User\ChangePassword.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

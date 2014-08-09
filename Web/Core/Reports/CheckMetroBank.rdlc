@@ -10,9 +10,7 @@
             <TextRuns>
               <TextRun>
                 <Value>=Parameters!Payee.Value</Value>
-                <Style>
-                  <FontSize>8pt</FontSize>
-                </Style>
+                <Style />
               </TextRun>
             </TextRuns>
             <Style />
@@ -20,7 +18,7 @@
         </Paragraphs>
         <rd:DefaultName>Textbox5</rd:DefaultName>
         <Top>0.71312in</Top>
-        <Left>1.59083in</Left>
+        <Left>1.71583in</Left>
         <Height>0.1875in</Height>
         <Width>3.54167in</Width>
         <Style>
@@ -42,17 +40,18 @@
               <TextRun>
                 <Value>=Parameters!Amount.Value</Value>
                 <Style>
-                  <FontSize>8pt</FontSize>
                   <Format>d</Format>
                 </Style>
               </TextRun>
             </TextRuns>
-            <Style />
+            <Style>
+              <TextAlign>Center</TextAlign>
+            </Style>
           </Paragraph>
         </Paragraphs>
         <rd:DefaultName>Textbox5</rd:DefaultName>
         <Top>0.7777in</Top>
-        <Left>5.88709in</Left>
+        <Left>6.01209in</Left>
         <Height>0.1875in</Height>
         <Width>1.5325in</Width>
         <ZIndex>1</ZIndex>
@@ -75,19 +74,18 @@
               <TextRun>
                 <Value>=Parameters!CheckDate.Value</Value>
                 <Style>
-                  <FontSize>8pt</FontSize>
                   <Format>d</Format>
                 </Style>
               </TextRun>
             </TextRuns>
             <Style>
-              <TextAlign>Left</TextAlign>
+              <TextAlign>Center</TextAlign>
             </Style>
           </Paragraph>
         </Paragraphs>
         <rd:DefaultName>Textbox5</rd:DefaultName>
         <Top>0.50062in</Top>
-        <Left>5.88709in</Left>
+        <Left>6.01209in</Left>
         <Height>0.1875in</Height>
         <Width>1.5325in</Width>
         <ZIndex>2</ZIndex>
@@ -109,9 +107,7 @@
             <TextRuns>
               <TextRun>
                 <Value>=Parameters!AmountText.Value</Value>
-                <Style>
-                  <FontSize>8pt</FontSize>
-                </Style>
+                <Style />
               </TextRun>
             </TextRuns>
             <Style />
@@ -119,7 +115,7 @@
         </Paragraphs>
         <rd:DefaultName>Textbox5</rd:DefaultName>
         <Top>1.03465in</Top>
-        <Left>1.59083in</Left>
+        <Left>1.71583in</Left>
         <Height>0.1875in</Height>
         <Width>5.82875in</Width>
         <ZIndex>3</ZIndex>

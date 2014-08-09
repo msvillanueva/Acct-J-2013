@@ -25,10 +25,17 @@ namespace Web.Controllers
             return View();
         }
 
+        public ActionResult ChangePassword()
+        {
+            ViewBag.Title = "Change Password";
+            ViewBag.SubTitle = "Replace your existing password.";
+            return View();
+        }
+
         [AcceptVerbs(HttpVerbs.Post)]
         public ActionResult Ajax_Read([DataSourceRequest] DataSourceRequest request)
         {
-            var data = LUser.GetUsers(UserSession.UserId);
+            var data = LUser.GetUsers();
             return Json(data.ToDataSourceResult(request));
         }
 
@@ -103,6 +110,8 @@ namespace Web.Controllers
             try
             {
                 var _user = LUser.GetUser(id);
+                if (UserSession.UserId == _user.ID)
+                    throw new Exception("You cannot delete your won account.");
                 LUser.Delete(_user.ID);
                 LSystemLog.Insert(UserSession.UserId, Core.Enumerations.ActionType.Delete, Core.Enumerations.ActionTable.User, _user.Username);
             }
@@ -111,6 +120,25 @@ namespace Web.Controllers
                 ModelState.AddModelError("data_error", ex.Message);
             }
             return Json(new[] { id }.ToDataSourceResult(request, ModelState));
+        }
+
+        [AcceptVerbs(HttpVerbs.Post)]
+        public ActionResult Ajax_ChangePassword([DataSourceRequest] DataSourceRequest request, string password, string oldpassword)
+        {
+            try
+            {
+                var _user = LUser.GetUser(UserSession.UserId);
+                if (_user.Password != Encryption.Encrypt(oldpassword))
+                    throw new Exception("Old password is invalid.");
+                _user.Password = password;
+                LUser.Update(_user);
+                LSystemLog.Insert(UserSession.UserId, Core.Enumerations.ActionType.Update, Core.Enumerations.ActionTable.User, _user.Username + " password");
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("data_error", ex.Message);
+            }
+            return Json(new[] { 1 }.ToDataSourceResult(request, ModelState));
         }
 
         [AcceptVerbs(HttpVerbs.Post)]

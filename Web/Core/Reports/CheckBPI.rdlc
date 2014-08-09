@@ -10,17 +10,15 @@
             <TextRuns>
               <TextRun>
                 <Value>=Parameters!Payee.Value</Value>
-                <Style>
-                  <FontSize>8pt</FontSize>
-                </Style>
+                <Style />
               </TextRun>
             </TextRuns>
             <Style />
           </Paragraph>
         </Paragraphs>
         <rd:DefaultName>Textbox5</rd:DefaultName>
-        <Top>0.65687in</Top>
-        <Left>1.63771in</Left>
+        <Top>0.69in</Top>
+        <Left>1.76271in</Left>
         <Height>0.1875in</Height>
         <Width>3.46875in</Width>
         <Style>
@@ -42,7 +40,6 @@
               <TextRun>
                 <Value>=Parameters!Amount.Value</Value>
                 <Style>
-                  <FontSize>8pt</FontSize>
                   <Format>d</Format>
                 </Style>
               </TextRun>
@@ -54,7 +51,7 @@
         </Paragraphs>
         <rd:DefaultName>Textbox5</rd:DefaultName>
         <Top>0.78187in</Top>
-        <Left>5.86105in</Left>
+        <Left>6.11105in</Left>
         <Height>0.1875in</Height>
         <Width>1.55333in</Width>
         <ZIndex>1</ZIndex>
@@ -77,7 +74,6 @@
               <TextRun>
                 <Value>=Parameters!CheckDate.Value</Value>
                 <Style>
-                  <FontSize>8pt</FontSize>
                   <Format>d</Format>
                 </Style>
               </TextRun>
@@ -89,7 +85,7 @@
         </Paragraphs>
         <rd:DefaultName>Textbox5</rd:DefaultName>
         <Top>0.46937in</Top>
-        <Left>5.86105in</Left>
+        <Left>6.11105in</Left>
         <Height>0.1875in</Height>
         <Width>1.55333in</Width>
         <ZIndex>2</ZIndex>
@@ -111,9 +107,7 @@
             <TextRuns>
               <TextRun>
                 <Value>=Parameters!AmountText.Value</Value>
-                <Style>
-                  <FontSize>8pt</FontSize>
-                </Style>
+                <Style />
               </TextRun>
             </TextRuns>
             <Style />
@@ -121,7 +115,7 @@
         </Paragraphs>
         <rd:DefaultName>Textbox5</rd:DefaultName>
         <Top>1.08396in</Top>
-        <Left>1.63771in</Left>
+        <Left>1.76271in</Left>
         <Height>0.1875in</Height>
         <Width>5.77667in</Width>
         <ZIndex>3</ZIndex>

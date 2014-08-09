@@ -97,7 +97,7 @@
 		            </ul>
 			        
 		            <ul class="alt-buttons">
-                        @*<li><a href="@Url.Action("Index", "Logs")" title=""><i class="icon-list"></i><span>Account Settings</span></a></li>*@
+                        <li><a href="@Url.Action("ChangePassword", "User")" title=""><i class="icon-cog"></i><span>Change Password</span></a></li>
                         <li><a href="#" title="" id="btnLogout" class="logout_button"><i class="icon-off"></i><span>Logout</span></a></li>
 		            </ul>
 			    </div>
@@ -136,7 +136,7 @@
 
 	<!-- Footer -->
 	<div id="footer">
-		<div class="copyrights">&copy;  JACA - 2013</div>
+		<div class="copyrights">&copy;  JACA - @DateTime.Now.Year</div>
 @*		<ul class="footer-links">
 			<li><a href="" title=""><i class="icon-cogs"></i>Contact admin</a></li>
 			<li><a href="" title=""><i class="icon-screenshot"></i>Report bug</a></li>

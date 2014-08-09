@@ -439,18 +439,21 @@ namespace Web.Core
                             foreach (var accountEntryPerType in accountEntriesPerType)
                             {
                                 var voucherEntries_ = voucherEntries.Where(a => a.AccountEntryID == accountEntryPerType.ID);
-                                var debits = voucherEntries_.Sum(a => a.Debit);
-                                var credits = voucherEntries_.Sum(a => a.Credit);
-                                amount = amount + (debits - credits);
-                                var invoiceEntries_ = invoiceEntries.Where(a => a.AccountEntryID == accountEntryPerType.ID);
-                                var invoiceAmounts = invoiceEntries_.Sum(a => a.Amount);
-                                amount = amount + invoiceAmounts;
-                                totalAssets = totalAssets + amount;
+                                if (voucherEntries_.Count() > 0)
+                                {
+                                    var debits = voucherEntries_.Sum(a => a.Debit);
+                                    var credits = voucherEntries_.Sum(a => a.Credit);
+                                    amount = amount + (debits - credits);
+                                    var invoiceEntries_ = invoiceEntries.Where(a => a.AccountEntryID == accountEntryPerType.ID);
+                                    var invoiceAmounts = invoiceEntries_.Sum(a => a.Amount);
+                                    amount = amount + invoiceAmounts;
+                                    totalAssets = totalAssets + amount;
 
-                                cells[row, 1].PutValue(accountEntryPerType.Code);
-                                cells[row, 2].PutValue(voucherEntries_.FirstOrDefault().AccountEntryName);
-                                cells[row, 3].PutValue(accountEntryPerType.TypeName);
-                                cells[row, 4].PutValue(Utility.To2Dec(amount));
+                                    cells[row, 1].PutValue(accountEntryPerType.Code);
+                                    cells[row, 2].PutValue(voucherEntries_.FirstOrDefault().AccountEntryName);
+                                    cells[row, 3].PutValue(accountEntryPerType.TypeName);
+                                    cells[row, 4].PutValue(Utility.To2Dec(amount));
+                                }
                                 row++;
                             }
                             row++;
