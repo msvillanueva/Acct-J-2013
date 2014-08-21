@@ -219,7 +219,7 @@ namespace Web.Reports
 
                 var par = new List<ReportParameter>();
                 par.Add(new ReportParameter("Payee", "** " + voucher.PayeeName + " **"));
-                par.Add(new ReportParameter("CheckDate","** " + (voucher.CheckDate != null ? ((DateTime)voucher.CheckDate).ToShortDateString() : "") + " **"));
+                par.Add(new ReportParameter("CheckDate", voucher.CheckDate != null ? ((DateTime)voucher.CheckDate).ToShortDateString() : ""));
                 var checkAmount = (decimal)(voucher.CheckAmount == null ? 0 : voucher.CheckAmount);
                 par.Add(new ReportParameter("Amount", "** " + checkAmount.ToString("#,###.00") + " **"));
                 par.Add(new ReportParameter("AmountText","** " + Utility.NumberToCurrencyText(checkAmount) + " **"));
